@@ -18,3 +18,6 @@ common --check_direct_dependencies=off
 # (Note that we use .bazelrc.user so the file appears next to .bazelrc in directory listing,
 # rather than user.bazelrc as suggested in the Bazel docs)
 try-import %workspace%/.bazelrc.user
+
+# Stardoc fails without this flag set.
+common --noincompatible_disallow_empty_glob

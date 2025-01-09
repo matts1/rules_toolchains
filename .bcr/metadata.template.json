@@ -1,6 +1,12 @@
 {
   "homepage": "https://github.com/matts1/rules_toolchains",
-  "maintainers": [],
+  "maintainers": [
+    {
+      "email": "msta@google.com",
+      "github": "matts1",
+      "name": "Matt Stark"
+    }
+  ],
   "repository": ["github:matts1/rules_toolchains"],
   "versions": [],
   "yanked_versions": {}
