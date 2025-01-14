@@ -1,0 +1,51 @@
+load("@rules_toolchains//toolchains:args.bzl", "args_add", "args_add_all", "args_add_joined", "args_add_strings")
+load("@rules_toolchains//toolchains:feature.bzl", "feature")
+
+package(default_visibility = ["//visibility:public"])
+
+args_add_strings(
+    name = "subcommand_compile",
+    actions = ["//lang/toolchain/actions:compile"],
+    env = {"LANG_ACTION_TYPE": "compile"},
+    values = ["compile"],
+)
+
+args_add_strings(
+    name = "subcommand_link",
+    actions = ["//lang/toolchain/actions:link"],
+    env = {"LANG_ACTION_TYPE": "link"},
+    values = ["link"],
+)
+
+args_add(
+    name = "output_file",
+    actions = ["//lang/toolchain/actions:compile_and_link"],
+    arg_name = "-o",
+    value = "//lang/toolchain/variables:output",
+)
+
+args_add_joined(
+    name = "source_files",
+    actions = ["//lang/toolchain/actions:compile"],
+    arg_name = "--srcs",
+    join_with = ",",
+    value = "//lang/toolchain/variables:source_files",
+)
+
+args_add_all(
+    name = "shared_libraries",
+    actions = ["//lang/toolchain/actions:compile_and_link"],
+    format_each = "--shared=%s",
+    value = "//lang/toolchain/variables:shared_libraries",
+)
+
+feature(
+    name = "default_args",
+    args = [
+        ":subcommand_compile",
+        ":subcommand_link",
+        ":source_files",
+        ":shared_libraries",
+        ":output_file",
+    ],
+)

@@ -1,0 +1,31 @@
+load("@rules_toolchains//toolchains:tool_map.bzl", "tool_map")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "compile_tool",
+    # Select over the exec platform.
+    actual = select({
+        # This would normally be defined in a repo rule to allow you to fetch the compiler from the network.
+        "//lang/toolchain/default_toolchain/tools/linux_x64:config": "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
+        "//conditions:default": "@platforms//:incompatible",
+    }),
+)
+
+alias(
+    name = "link_tool",
+    # Select over the exec platform.
+    actual = select({
+        # This would normally be defined in a repo rule to allow you to fetch the compiler from the network.
+        "//lang/toolchain/default_toolchain/tools/linux_x64:config": "//lang/toolchain/default_toolchain/tools/linux_x64:link_tool",
+        "//conditions:default": "@platforms//:incompatible",
+    }),
+)
+
+tool_map(
+    name = "tool_map",
+    tools = {
+        "//lang/toolchain/actions:compile": ":compile_tool",
+        "//lang/toolchain/actions:link": ":link_tool",
+    },
+)

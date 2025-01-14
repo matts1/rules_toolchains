@@ -28,6 +28,7 @@ jobs:
       exclude: |
         [
           {"folder": ".", "bzlmodEnabled": false}
+          {"folder": "examples/rules_lang", "bzlmodEnabled": false}
         ]
   pre-commit:
     runs-on: ubuntu-latest
