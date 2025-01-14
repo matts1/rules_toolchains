@@ -1,33 +1,29 @@
-# Template for Bazel rules
+# Toolchain rules for bazel
 
-Copy this template to create a Bazel ruleset.
+This repository contains rules for configuring toolchains. It is designed to be integrated with rulesets to allow a ruleset to specify what they *want* an action to do, and have the configuration decide how to achieve that. For example, a ruleset author would specify `run_action(action_type=compile, variables = struct(header_files = [foo.h], source_files = [foo.cc], output = [foo.o]), inputs=[foo.cc, foo.h], outputs = [foo.o])`, and the configuration would turn that into the command-line `clang++ foo.cc foo.h -o foo.o`.
 
-Features:
+# Getting Started
 
-- follows the official style guide at https://bazel.build/rules/deploying
-- allows for both WORKSPACE.bazel and bzlmod (MODULE.bazel) usage
-- includes Bazel formatting as a pre-commit hook (using [buildifier])
-- includes stardoc API documentation generator
-- includes typical toolchain setup
-- CI configured with GitHub Actions
-- release using GitHub Actions just by pushing a tag
-- the release artifact doesn't need to be built by Bazel, but can still exclude files and stamp the version
+Add the following to your `MODULE.bazel` file:
 
-# Bazel rules for toolchains
+```starlark
+bazel_dep(name = "rules_testing", version = "<version>")
+```
 
-## Installation
+## For ruleset authors
 
-From the release you wish to use:
-<https://github.com/matts1/rules_toolchains/releases>
-copy the WORKSPACE snippet into your `WORKSPACE` file.
+Look at `examples/rules_lang`. You will first need to configure your toolchain to take in a `ToolchainConfig` parameter.
 
-To use a commit rather than a release, you can point at any SHA of the repo.
+Once you've done that, you'll need to configure your rule to, instead of calling `ctx.actions.run`, call `run_action` (see [`examples/rules_lang/lang/defs.bzl`](examples/rules_lang/lang/defs.bzl)).
 
-For example to use commit `abc123`:
+## For toolchain authors
+Either use the default toolchain configured by your ruleset author, or create a custom `toolchain_config` rule.
 
-1. Replace `url = "https://github.com/matts1/rules_toolchains/releases/download/v0.1.0/rules_toolchains-v0.1.0.tar.gz"` with a GitHub-provided source archive like `url = "https://github.com/matts1/rules_toolchains/archive/abc123.tar.gz"`
-1. Replace `strip_prefix = "rules_toolchains-0.1.0"` with `strip_prefix = "rules_toolchains-abc123"`
-1. Update the `sha256`. The easiest way to do this is to comment out the line, then Bazel will
-   print a message with the correct value. Note that GitHub source archives don't have a strong
-   guarantee on the sha256 stability, see
-   <https://github.blog/2023-02-21-update-on-the-future-stability-of-source-code-archives-and-hashes/>
+# Testing
+`rules_toolchains` supports generating "input files". These files contain a full specification of generated actions, and can be used to validate that your toolchain configuration works as intended with golden tests. For an example of how this works, see `@rules_toolchain//tests`.
+
+# Contributing
+
+We appreciate your help!
+
+To contribute, please read the contribution guidelines: [CONTRIBUTING.md](https://github.com/matts1/rules_toolchains/blob/main/CONTRIBUTING.md).

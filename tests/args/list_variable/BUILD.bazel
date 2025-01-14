@@ -1,0 +1,79 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@rules_toolchains//toolchains:args.bzl", "args_add_all", "args_add_joined")
+load("@rules_toolchains//toolchains:variables.bzl", "input_file_list_variable", "string_list_variable")
+load("//tests/rules:rules.bzl", "failing_action_test", "run_action_test")
+
+package(default_visibility = ["//visibility:public"])
+
+string_list_variable(
+    name = "strings",
+    actions = ["//tests/toolchain/actions:compile"],
+)
+
+string_list_variable(
+    name = "empty",
+    actions = ["//tests/toolchain/actions:compile"],
+)
+
+input_file_list_variable(
+    name = "input_files",
+    actions = ["//tests/toolchain/actions:compile"],
+)
+
+args_add_all(
+    name = "strings_arg",
+    actions = ["//tests/toolchain/actions:compile"],
+    arg_name = "start",
+    before_each = "mvalue",
+    terminate_with = "finish",
+    value = ":strings",
+)
+
+args_add_all(
+    name = "empty_arg",
+    actions = ["//tests/toolchain/actions:compile"],
+    arg_name = "SHOULD_NOT_SHOW",
+    omit_if_empty = True,
+    value = ":empty",
+)
+args_add_joined(
+    name = "input_files_arg",
+    actions = ["//tests/toolchain/actions:compile"],
+    format_each = "file=%s",
+    join_with = ",",
+    value = ":input_files",
+)
+
+run_action_test(
+    name = "valid_args_test",
+    action = "//tests/toolchain/actions:compile",
+    extra_args = [
+        ":strings_arg",
+        ":empty_arg",
+        ":input_files_arg",
+    ],
+)
+
+string_list_variable(
+    name = "missing",
+    actions = ["//tests/toolchain/actions:compile"],
+)
+
+args_add_all(
+    name = "missing_arg",
+    actions = ["//tests/toolchain/actions:compile"],
+    value = ":missing",
+)
+
+failing_action_test(
+    name = "missing_test",
+    action = "//tests/toolchain/actions:compile",
+    extra_args = [":missing_arg"],
+    want_error = "@@//tests/args/list_variable:missing was not provided, but is referenced by @@//tests/args/list_variable:missing_arg",
+)
+
+write_source_files(
+    name = "update_goldens",
+    additional_update_targets = [":valid_args"],
+    visibility = ["//tests:__pkg__"],
+)

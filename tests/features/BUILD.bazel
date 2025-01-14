@@ -1,0 +1,227 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("//tests/rules:rules.bzl", "failing_action_test", "run_action_test")
+load("//toolchains:feature.bzl", "feature")
+load("//toolchains:feature_constraint.bzl", "feature_constraint")
+load("//toolchains:feature_set.bzl", "feature_set")
+load("//toolchains:mutually_exclusive_category.bzl", "mutually_exclusive_category")
+
+run_action_test(
+    name = "empty_toolchain_test",
+    action = "//tests/toolchain/actions:compile",
+)
+
+run_action_test(
+    name = "duplicate_feature_test",
+    action = "//tests/toolchain/actions:compile",
+    enabled_features = ["//tests/toolchain:default_feature_implies"],
+)
+
+run_action_test(
+    name = "disable_all_features_test",
+    action = "//tests/toolchain/actions:compile",
+    disabled_features = [
+        "//tests/toolchain:default_feature",
+        "//tests/toolchain:default_feature_implies",
+    ],
+)
+
+failing_action_test(
+    name = "disable_implied_feature_test",
+    action = "//tests/toolchain/actions:compile",
+    disabled_features = ["//tests/toolchain:default_feature_implied"],
+    want_error = "@@//tests/toolchain:default_feature_implied is marked as disabled, but is implied by @@//tests/toolchain:default_feature_implies, which is enabled",
+)
+
+feature(
+    name = "feature1",
+)
+
+failing_action_test(
+    name = "disable_enabled_feature_test",
+    action = "//tests/toolchain/actions:compile",
+    disabled_features = [":feature1"],
+    enabled_features = [":feature1"],
+    want_error = "@@//tests/features:feature1 is marked as both an enabled feature and a disabled feature",
+)
+
+run_action_test(
+    name = "enable_feature1_test",
+    action = "//tests/toolchain/actions:compile",
+    enabled_features = [":feature1"],
+)
+
+feature(
+    name = "implies",
+    implies = [":implied"],
+)
+
+feature(name = "implied")
+
+run_action_test(
+    name = "enable_implies_test",
+    action = "//tests/toolchain/actions:compile",
+    enabled_features = [":implies"],
+)
+
+feature(
+    name = "feature2",
+)
+
+feature(
+    name = "requires_feature1",
+    requires = [
+        ":feature1",
+    ],
+)
+
+failing_action_test(
+    name = "requirement_unmet_test",
+    action = "//tests/toolchain/actions:compile",
+    enabled_features = [":requires_feature1"],
+    want_error = """@@//tests/features:requires_feature1 requires @@//tests/features:feature1.
+@@//tests/features:feature1 is disabled""")
+
+
+feature_set(
+    name = "feature1_and_feature2",
+    all_of = [
+        ":feature1",
+        ":feature2",
+    ],
+)
+
+feature(
+    name = "requires_feature1_and_feature2",
+    requires = [":feature1_and_feature2"],
+)
+
+feature_constraint(
+    name = "feature1_or_feature2",
+    any_of = [":feature1", "feature2"],
+)
+
+feature(
+    name = "requires_feature1_or_feature2",
+    requires = [":feature1_or_feature2"],
+)
+
+run_action_test(
+    name = "or_requirement_met_test",
+    action = "//tests/toolchain/actions:compile",
+    enabled_features = [
+        ":feature1",
+        ":requires_feature1_or_feature2",
+    ],
+)
+
+failing_action_test(
+    name = "or_requirement_unmet_test",
+    action = "//tests/toolchain/actions:compile",
+    enabled_features = [":requires_feature1_or_feature2"],
+    want_error = "@@//tests/features:feature1_or_feature2 is unmet because (@@//tests/features:feature1 is disabled) and (@@//tests/features:feature2 is disabled)",
+)
+
+run_action_test(
+    name = "and_requirement_met_test",
+    action = "//tests/toolchain/actions:compile",
+    enabled_features = [
+        ":feature1",
+        ":feature2",
+        ":requires_feature1_and_feature2",
+    ],
+)
+
+failing_action_test(
+    name = "and_requirement_unmet_test",
+    action = "//tests/toolchain/actions:compile",
+    enabled_features = [
+        ":feature1",
+        ":requires_feature1_and_feature2",
+    ],
+    want_error = """@@//tests/features:requires_feature1_and_feature2 requires @@//tests/features:feature1_and_feature2.
+@@//tests/features:feature1_and_feature2 is unmet because @@//tests/features:feature2 is disabled""",
+)
+
+feature_constraint(
+    name = "feature1_and_not_feature2",
+    all_of = [":feature1"],
+    none_of = [":feature2"],
+)
+
+feature(
+    name = "requires_feature1_and_not_feature2",
+    requires = [":feature1_and_not_feature2"],
+)
+
+failing_action_test(
+    name = "and_not_requirement_unmet_test",
+    action = "//tests/toolchain/actions:compile",
+    enabled_features = [
+        ":feature1",
+        ":feature2",
+        ":requires_feature1_and_not_feature2",
+    ],
+    want_error = "@@//tests/features:feature1_and_not_feature2 is unmet because @@//tests/features:feature2 is met",
+)
+
+run_action_test(
+    name = "and_not_requirement_met_test",
+    action = "//tests/toolchain/actions:compile",
+    enabled_features = [
+        ":feature1",
+        ":requires_feature1_and_not_feature2",
+    ],
+)
+
+mutually_exclusive_category(name = "category")
+
+feature(
+    name = "mutually_exclusive",
+    mutually_exclusive = [":category"],
+)
+
+feature(
+    name = "mutually_exclusive_category",
+    mutually_exclusive = [":category"],
+)
+
+failing_action_test(
+    name = "mutually_exclusive_category_test",
+    action = "//tests/toolchain/actions:compile",
+    enabled_features = [
+        ":mutually_exclusive",
+        "mutually_exclusive_category",
+    ],
+    want_error = "@@//tests/features:mutually_exclusive and @@//tests/features:mutually_exclusive_category are mutually exclusive (due to the category @@//tests/features:category)",
+)
+
+feature(
+    name = "mutually_exclusive_feature",
+    mutually_exclusive = [":mutually_exclusive"],
+)
+
+failing_action_test(
+    name = "mutually_exclusive_feature_test",
+    action = "//tests/toolchain/actions:compile",
+    enabled_features = [
+        ":mutually_exclusive",
+        "mutually_exclusive_feature",
+    ],
+    want_error = "@@//tests/features:mutually_exclusive_feature and @@//tests/features:mutually_exclusive are mutually exclusive",
+)
+
+# TODO: rule finalizer
+write_source_files(
+    name = "update_goldens",
+    additional_update_targets = [
+        ":empty_toolchain",
+        ":duplicate_feature",
+        ":disable_all_features",
+        ":enable_feature1",
+        ":enable_implies",
+        ":or_requirement_met",
+        ":and_requirement_met",
+        ":and_not_requirement_met",
+    ],
+    visibility = ["//tests:__pkg__"],
+)

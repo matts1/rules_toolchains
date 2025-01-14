@@ -1,0 +1,117 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@rules_testing//lib:analysis_test.bzl", "analysis_test")
+load("@rules_testing//lib:util.bzl", "util")
+load("@rules_toolchains//toolchains:args.bzl", "args_add")
+load("@rules_toolchains//toolchains:variables.bzl", "input_file_variable", "string_variable")
+load("//tests/rules:rules.bzl", "error_matching", "failing_action_test", "run_action_test")
+
+string_variable(
+    name = "string",
+    actions = ["//tests/toolchain/actions:compile"],
+    mandatory = True,
+)
+
+args_add(
+    name = "string_arg",
+    actions = ["//tests/toolchain/actions:compile"],
+    arg_name = "mandatory",
+    format = "value=%s",
+    value = ":string",
+)
+
+input_file_variable(
+    name = "none",
+    actions = ["//tests/toolchain/actions:compile"],
+    mandatory = False,
+)
+
+args_add(
+    name = "none_arg",
+    actions = ["//tests/toolchain/actions:compile"],
+    arg_name = "SHOULD_NOT_SHOW",
+    format = "value=%s",
+    value = ":none",
+)
+
+input_file_variable(
+    name = "input_file",
+    actions = ["//tests/toolchain/actions:compile"],
+    mandatory = True,
+)
+
+args_add(
+    name = "input_file_arg",
+    actions = ["//tests/toolchain/actions:compile"],
+    value = ":input_file",
+)
+
+run_action_test(
+    name = "valid_args_test",
+    action = "//tests/toolchain/actions:compile",
+    extra_args = [
+        ":string_arg",
+        ":none_arg",
+        ":input_file_arg",
+    ],
+)
+
+util.helper_target(
+    args_add,
+    name = "wrong_action_arg",
+    actions = ["//tests/toolchain/actions:link"],
+    value = ":string",
+)
+
+analysis_test(
+    name = "wrong_action_arg_test",
+    expect_failure = True,
+    impl = error_matching("""@@//tests/toolchain/actions:link is not a valid action for @@//tests/args/variable:string, which restricts the actions to:
+  @@//tests/toolchain/actions:compile"""),
+    target = ":wrong_action_arg",
+)
+
+string_variable(
+    name = "missing",
+    actions = ["//tests/toolchain/actions:compile"],
+    mandatory = False,
+)
+
+args_add(
+    name = "missing_arg",
+    actions = ["//tests/toolchain/actions:compile"],
+    value = ":missing",
+)
+
+failing_action_test(
+    name = "missing_test",
+    action = "//tests/toolchain/actions:compile",
+    extra_args = [":missing_arg"],
+    want_error = "@@//tests/args/variable:missing was not provided, but is referenced by @@//tests/args/variable:missing_arg.",
+)
+
+string_variable(
+    name = "mandatory_none",
+    variable_name = "none",
+    actions = ["//tests/toolchain/actions:compile"],
+    mandatory = True,
+)
+
+args_add(
+    name = "mandatory_none_arg",
+    actions = ["//tests/toolchain/actions:compile"],
+    value = ":mandatory_none",
+)
+
+failing_action_test(
+    name = "mandatory_none_test",
+    action = "//tests/toolchain/actions:compile",
+    extra_args = [":mandatory_none_arg"],
+    want_error = "@@//tests/args/variable:mandatory_none was None",
+)
+
+
+write_source_files(
+    name = "update_goldens",
+    additional_update_targets = [":valid_args"],
+    visibility = ["//tests:__pkg__"],
+)
