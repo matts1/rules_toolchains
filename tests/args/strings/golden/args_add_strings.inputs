@@ -1,0 +1,28 @@
+Action: @@//tests/toolchain/actions:compile
+Tool: @@//tests/toolchain/tools:tool_with_capability (tests/toolchain/tools/cat_tool.sh)
+Progress message: ''
+
+Inputs:
+tests/args/strings/testdata/foo
+tests/toolchain/tools/cat_tool.sh
+
+Outputs:
+bazel-out/<config>/bin/tests/args/strings/_args_add_strings_subject.output
+
+Features:
+@@//tests/toolchain:default_feature_implies
+@@//tests/toolchain:default_feature_implied
+@@//tests/toolchain:default_feature
+@@//tests/toolchain/tools:capability
+
+Execution requirements:
+
+
+Env:
+  STRING1='S1'
+  STRING2='S2'
+
+Command-line:
+@@//tests/args/strings:strings
+  string1
+  string2

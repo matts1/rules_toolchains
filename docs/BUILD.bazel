@@ -3,8 +3,63 @@
 load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
 
 stardoc_with_diff_test(
-    name = "rules",
-    bzl_library_target = "//toolchains:defs",
+    name = "args",
+    bzl_library_target = "//toolchains:args",
+)
+
+stardoc_with_diff_test(
+    name = "args_list",
+    bzl_library_target = "//toolchains:args_list",
+)
+
+stardoc_with_diff_test(
+    name = "feature",
+    bzl_library_target = "//toolchains:feature",
+)
+
+stardoc_with_diff_test(
+    name = "feature_constraint",
+    bzl_library_target = "//toolchains:feature_set",
+)
+
+stardoc_with_diff_test(
+    name = "feature_set",
+    bzl_library_target = "//toolchains:feature_set",
+)
+
+stardoc_with_diff_test(
+    name = "generic_rule",
+    bzl_library_target = "//toolchains:generic_rule",
+)
+
+stardoc_with_diff_test(
+    name = "mutually_exclusive_category",
+    bzl_library_target = "//toolchains:mutually_exclusive_category",
+)
+
+stardoc_with_diff_test(
+    name = "tool",
+    bzl_library_target = "//toolchains:tool",
+)
+
+stardoc_with_diff_test(
+    name = "tool_capability",
+    bzl_library_target = "//toolchains:tool_capability",
+)
+
+stardoc_with_diff_test(
+    name = "tool_map",
+    bzl_library_target = "//toolchains:tool_map",
+)
+
+stardoc_with_diff_test(
+    name = "toolchain_config",
+    bzl_library_target = "//toolchains:toolchain_config",
+)
+
+stardoc_with_diff_test(
+    name = "variables",
+    bzl_library_target = "//toolchains:variables",
 )
 
 update_docs(name = "update")

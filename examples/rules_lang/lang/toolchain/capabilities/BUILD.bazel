@@ -1,0 +1,7 @@
+load("@rules_toolchains//toolchains:tool_capability.bzl", "tool_capability")
+
+package(default_visibility = ["//visibility:public"])
+
+tool_capability(
+    name = "supports_foo",
+)

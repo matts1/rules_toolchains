@@ -1,0 +1,22 @@
+Action: @@//tests/toolchain/actions:link
+Tool: @@//tests/toolchain/tools:simple_tool (tests/toolchain/tools/cat_tool.sh)
+Progress message: ''
+
+Inputs:
+tests/toolchain/tools/cat_tool.sh
+
+Outputs:
+bazel-out/<config>/bin/tests/args/strings/_requirement_unmet_for_wrong_action_subject.output
+
+Features:
+@@//tests/toolchain:default_feature_implies
+@@//tests/toolchain:default_feature_implied
+@@//tests/toolchain:default_feature
+
+Execution requirements:
+
+
+Env:
+
+
+Command-line:
