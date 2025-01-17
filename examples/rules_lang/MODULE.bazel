@@ -1,7 +1,14 @@
-bazel_dep(name = "rules_toolchains", version = "0.0.0", dev_dependency = True)
-bazel_dep(name = "bazel_skylib", version = "1.7.1", dev_dependency = True)
+module(name = "rules_lang")
+
+bazel_dep(
+    name = "rules_toolchains",
+    version = "0.0.0",
+)
+bazel_dep(name = "platforms", version = "0.0.10")
 
 local_path_override(
     module_name = "rules_toolchains",
     path = "../..",
 )
+
+register_toolchains("//lang/toolchain/default_toolchain")

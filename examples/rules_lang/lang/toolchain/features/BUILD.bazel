@@ -1,0 +1,11 @@
+load("@rules_toolchains//toolchains:feature.bzl", "feature")
+
+package(default_visibility = ["//visibility:public"])
+
+feature(
+    name = "feature1",
+)
+
+feature(
+    name = "feature2",
+)

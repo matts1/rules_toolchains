@@ -1,0 +1,11 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+
+write_source_files(
+    name = "update_goldens",
+    additional_update_targets = [
+        "//tests/args/strings:update_goldens",
+        "//tests/args/variable:update_goldens",
+        "//tests/args/list_variable:update_goldens",
+        "//tests/features:update_goldens",
+    ],
+)

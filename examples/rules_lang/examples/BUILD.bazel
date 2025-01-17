@@ -1,0 +1,27 @@
+load("//lang:defs.bzl", "lang_binary", "lang_library", "lang_test")
+
+lang_library(
+    name = "leaf_lib",
+    srcs = [
+        "leaf_lib.lang",
+        "leaf_lib2.lang",
+    ],
+)
+
+lang_library(
+    name = "lib",
+    srcs = ["lib.lang"],
+    deps = [":leaf_lib"],
+)
+
+lang_test(
+    name = "lib_test",
+    srcs = ["lib_test.lang"],
+    deps = [":lib"],
+)
+
+lang_binary(
+    name = "main",
+    srcs = ["main.lang"],
+    deps = [":lib"],
+)
