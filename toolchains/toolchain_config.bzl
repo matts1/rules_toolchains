@@ -25,6 +25,22 @@ load("//toolchains/private:features.bzl", "get_features")
 
 visibility("public")
 
+_PLATFORM = "//command_line_option:platforms"
+_NO_EXEC_PLATFORM_ERROR = """You must specify an execution platform for your toolchain.
+
+If you have no remote execution configured, set exec_platforms = {"@platforms//host: []}
+
+If you do have remote execution, each remote execution platform must be listed below.
+For example, given the platform
+```
+platform(name = "linux_amd64", constraints = ["@platforms//os:linux", "@platforms//cpu:x86_64"])
+```
+
+You would write {
+    "//path/to:linux_amd64": ["@platforms//os:linux", "@platforms//cpu:x86_64"]
+}
+        """
+
 def _create_toolchain(*, label, enabled_features, tool_map):
     capabilities_to_features = {}
     defaults = {}
@@ -49,7 +65,7 @@ def _toolchain_config_impl(ctx):
     toolchain_config = _create_toolchain(
         label = ctx.label,
         enabled_features = collect_features(collect_provider(ctx.attr.default_features, FeatureSetInfo)),
-        tool_map = ctx.attr.tool_map[ToolMapInfo],
+        tool_map = ctx.attr.tool_map[0][ToolMapInfo],
     )
 
     return [
@@ -57,7 +73,16 @@ def _toolchain_config_impl(ctx):
         platform_common.ToolchainInfo(config = toolchain_config),
     ]
 
-toolchain_config = rule(
+def _exec_platform_impl(_, attr):
+    return {_PLATFORM: str(attr.exec_platform), "//command_line_option:cpu": "aarch64"}
+
+_exec_platform = transition(
+    implementation = _exec_platform_impl,
+    inputs = [],
+    outputs = [_PLATFORM, "//command_line_option:cpu"],
+)
+
+_toolchain_config = rule(
     implementation = _toolchain_config_impl,
     attrs = {
         # Explicitly do not support always enabled args, as it leads to more
@@ -66,7 +91,41 @@ toolchain_config = rule(
         # features and make the visibility of the feature private so no-one
         # can turn it off.
         "default_features": attr.label_list(providers = [FeatureSetInfo]),
-        "tool_map": attr.label(providers = [ToolMapInfo], mandatory = True),
+        # cfg = "exec" does not work
+        # https://github.com/bazelbuild/rules_cc/issues/299#issuecomment-2659621078
+        "tool_map": attr.label(providers = [ToolMapInfo], cfg = _exec_platform, mandatory = True),
+        "exec_platform": attr.label(providers = [platform_common.PlatformInfo], mandatory = True),
     },
     provides = [platform_common.ToolchainInfo],
 )
+
+def toolchain(
+    name,
+    default_features,
+    tool_map,
+    toolchain_type,
+    exec_platforms = None,
+):
+    if not exec_platforms:
+        fail(_NO_EXEC_PLATFORM_ERROR)
+    for platform, constraints in exec_platforms.items():
+        platform = native.package_relative_label(platform)
+
+        toolchain_name = "%s_%s" % (name, platform.name)
+        config_name = "_%s_config" % toolchain_name
+
+        _toolchain_config(
+            name = config_name,
+            default_features = default_features,
+            tool_map = tool_map,
+            exec_platform = platform,
+        )
+
+        native.toolchain(
+            name = toolchain_name,
+            toolchain = config_name,
+            toolchain_type = toolchain_type,
+            # It'd be nice to be able to just pass the platform itself as a constraint.
+            # See github.com/bazelbuild/bazel/issues/25363
+            exec_compatible_with = constraints,
+        )
