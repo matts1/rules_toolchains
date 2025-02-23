@@ -1,21 +1,26 @@
-load("@rules_toolchains//toolchains:toolchain_config.bzl", "toolchain_config")
+load("@rules_toolchains//toolchains:toolchain_config.bzl", "toolchain")
 
 package(default_visibility = ["//visibility:public"])
 
-toolchain_config(
-    name = "default_toolchain_config",
+toolchain(
+    name = "toolchain",
     default_features = [
         "//lang/toolchain/args:default_args",
         "//lang/toolchain/features:feature1",
     ],
     # If you have tools such as clang which have seperate binaries per exec-target pair (eg. gcc-<exec>-<target>),
-    # you can perform a select here over the target platform, then perform a select over the exec platform in the tool.
-    tool_map = "//lang/toolchain/default_toolchain/tools:tool_map",
-)
-
-toolchain(
-    name = "default_toolchain",
-    # You shouldn't need exec_compatible_with and target_compatible_with here, because you can use selects.
-    toolchain = ":default_toolchain_config",
+    # you can perform a select here over the target platform, and perform a select over the exec platform in the tool.
+    tool_map = select({
+        "@rules_toolchains//tests/platforms:target1": "//lang/toolchain/default_toolchain/tools:tool_map",
+        "//conditions:default": "@platforms//:incompatible"
+    }),
     toolchain_type = "//lang/toolchain:toolchain_type",
+    exec_platforms = {
+        "@rules_toolchains//tests/platforms:exec_platform1":
+        # Lie to it to convince it that when we're on the host platform, we're actually on the exec platform.
+        # This allows us to test that the transition is working as intended.
+          ["@rules_toolchains//tests/platforms:host"],
+        "@rules_toolchains//tests/platforms:exec_platform2":
+          ["@rules_toolchains//tests/platforms:exec2"],
+    }
 )

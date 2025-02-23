@@ -56,7 +56,6 @@ See //toolchains/actions:BUILD for valid options.
         ),
         "tools": attr.label_list(
             mandatory = True,
-            cfg = "exec",
             allow_files = True,
             doc = """The tool to use for the specified actions.
 
