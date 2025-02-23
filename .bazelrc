@@ -21,3 +21,8 @@ try-import %workspace%/.bazelrc.user
 
 # Stardoc fails without this flag set.
 common --noincompatible_disallow_empty_glob
+
+common --experimental_platforms_api
+
+build --host_platform=@rules_toolchains//tests/platforms:host_platform
+build --platforms=@rules_toolchains//tests/platforms:target_platform1

@@ -13,6 +13,6 @@ bazel_dep(name = "aspect_bazel_lib", version = "2.10.0", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "6.1.2", dev_dependency = True)
 
 register_toolchains(
-    "//tests/toolchain",
+    "//tests/toolchain:all",
     dev_dependency = True,
 )

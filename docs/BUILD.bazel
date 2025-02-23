@@ -53,8 +53,13 @@ stardoc_with_diff_test(
 )
 
 stardoc_with_diff_test(
-    name = "toolchain_config",
-    bzl_library_target = "//toolchains:toolchain_config",
+    name = "toolchain",
+    bzl_library_target = "//toolchains:toolchain",
+)
+
+stardoc_with_diff_test(
+    name = "toolchain_info",
+    bzl_library_target = "//toolchains:toolchain_info",
 )
 
 stardoc_with_diff_test(

@@ -4,26 +4,36 @@ package(default_visibility = ["//visibility:public"])
 
 alias(
     name = "compile_tool",
-    # Select over the exec platform.
+    # actual = "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
     actual = select({
         # This would normally be defined in a repo rule to allow you to fetch the compiler from the network.
-        "//lang/toolchain/default_toolchain/tools/linux_x64:config": "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
+        "@rules_toolchains//tests/platforms:exec1": "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
+        "@rules_toolchains//tests/platforms:exec2": "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
         "//conditions:default": "@platforms//:incompatible",
     }),
+    # Manual because we require a transition to the exec platform.
+    # You shouldn't need this.
+    tags = ["manual"],
 )
 
 alias(
     name = "link_tool",
-    # Select over the exec platform.
     actual = select({
         # This would normally be defined in a repo rule to allow you to fetch the compiler from the network.
-        "//lang/toolchain/default_toolchain/tools/linux_x64:config": "//lang/toolchain/default_toolchain/tools/linux_x64:link_tool",
+        "@rules_toolchains//tests/platforms:exec1": "//lang/toolchain/default_toolchain/tools/linux_x64:link_tool",
+        "@rules_toolchains//tests/platforms:exec2": "//lang/toolchain/default_toolchain/tools/linux_x64:link_tool",
         "//conditions:default": "@platforms//:incompatible",
     }),
+    # Manual because we require a transition to the exec platform.
+    # You shouldn't need this.
+    tags = ["manual"],
 )
 
 tool_map(
     name = "tool_map",
+    # Manual because we require a transition to the exec platform.
+    # You shouldn't need this.
+    tags = ["manual"],
     tools = {
         "//lang/toolchain/actions:compile": ":compile_tool",
         "//lang/toolchain/actions:link": ":link_tool",
