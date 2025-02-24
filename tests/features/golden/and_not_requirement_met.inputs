@@ -1,0 +1,25 @@
+Action: @@//tests/toolchain/actions:compile
+Tool: @@//tests/toolchain/tools:tool_with_capability (tests/toolchain/tools/cat_tool.sh)
+Progress message: ''
+
+Inputs:
+tests/toolchain/tools/cat_tool.sh
+
+Outputs:
+bazel-out/<config>/bin/tests/features/_and_not_requirement_met_subject.output
+
+Features:
+@@//tests/toolchain:default_feature_implies
+@@//tests/toolchain:default_feature_implied
+@@//tests/toolchain:default_feature
+@@//tests/toolchain/tools:capability
+@@//tests/features:feature1
+@@//tests/features:requires_feature1_and_not_feature2
+
+Execution requirements:
+
+
+Env:
+
+
+Command-line:

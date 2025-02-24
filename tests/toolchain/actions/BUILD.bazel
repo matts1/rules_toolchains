@@ -1,0 +1,21 @@
+load("@rules_toolchains//toolchains:actions.bzl", "action_type", "action_type_set")
+
+package(default_visibility = ["//visibility:public"])
+
+action_type(
+    name = "compile",
+    mnemonic = "TestCompile",
+)
+
+action_type(
+    name = "link",
+    mnemonic = "TestLink",
+)
+
+action_type_set(
+    name = "all_actions",
+    actions = [
+        ":compile",
+        ":link",
+    ],
+)

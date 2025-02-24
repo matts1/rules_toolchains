@@ -1,0 +1,30 @@
+Action: @@//tests/toolchain/actions:compile
+Tool: @@//tests/toolchain/tools:tool_with_capability (tests/toolchain/tools/cat_tool.sh)
+Progress message: ''
+
+Inputs:
+tests/rules/testdata/first_file
+tests/toolchain/tools/cat_tool.sh
+
+Outputs:
+bazel-out/<config>/bin/tests/args/variable/_valid_args_subject.output
+
+Features:
+@@//tests/toolchain:default_feature_implies
+@@//tests/toolchain:default_feature_implied
+@@//tests/toolchain:default_feature
+@@//tests/toolchain/tools:capability
+
+Execution requirements:
+
+
+Env:
+
+
+Command-line:
+@@//tests/args/variable:string_arg
+  mandatory
+  value=mandatory_string_value
+@@//tests/args/variable:none_arg
+@@//tests/args/variable:input_file_arg
+  tests/rules/testdata/first_file

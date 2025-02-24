@@ -1,52 +1,158 @@
+# Copyright 2025 The Bazel Authors. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-load("//toolchains/private:resolved_toolchain.bzl", "resolved_toolchain")
-
-# For stardoc to reference the files
-exports_files(["defs.bzl"])
-
-# This is the target rule authors should put in their "toolchains"
-# attribute in order to get a runtime for the correct platform.
-# See https://docs.bazel.build/versions/main/toolchains.html#writing-rules-that-use-toolchains
-toolchain_type(
-    name = "toolchain_type",
-    visibility = ["//visibility:public"],
-)
-
-resolved_toolchain(
-    name = "resolved_toolchain",
-    # Marked manual so that `bazel test //...` passes
-    # even if no toolchain is registered.
-    tags = ["manual"],
-    visibility = ["//visibility:public"],
-)
 
 bzl_library(
-    name = "repositories",
-    srcs = ["repositories.bzl"],
-    visibility = ["//visibility:public"],
+    name = "actions",
+    srcs = ["actions.bzl"],
     deps = [
-        "//toolchains/private:toolchains_repo",
-        "//toolchains/private:versions",
-        "@bazel_tools//tools/build_defs/repo:http.bzl",
-        "@bazel_tools//tools/build_defs/repo:utils.bzl",
+        ":toolchain_info",
+        "//toolchains/private:collect",
     ],
-)
-
-bzl_library(
-    name = "defs",
-    srcs = ["defs.bzl"],
     visibility = ["//visibility:public"],
 )
 
 bzl_library(
-    name = "extensions",
-    srcs = ["extensions.bzl"],
+    name = "args",
+    srcs = ["args.bzl"],
+    deps = [
+        ":toolchain_info",
+        "//toolchains/private:collect",
+    ],
     visibility = ["//visibility:public"],
-    deps = [":repositories"],
 )
 
 bzl_library(
-    name = "toolchain",
-    srcs = ["toolchain.bzl"],
+    name = "args_list",
+    srcs = ["args_list.bzl"],
+    deps = [
+        ":toolchain_info",
+        "//toolchains/private:collect",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "feature",
+    srcs = ["feature.bzl"],
+    deps = [
+        ":toolchain_info",
+        "//toolchains/private:collect",
+        "//toolchains/private:small_set",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "feature_constraint",
+    srcs = ["feature_set.bzl"],
+    deps = [
+        ":toolchain_info",
+        "//toolchains/private:collect",
+        "//toolchains/private:features",
+        "//toolchains/private:small_set",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "feature_set",
+    srcs = ["feature_set.bzl"],
+    deps = [
+        ":toolchain_info",
+        "//toolchains/private:collect",
+        "//toolchains/private:features",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "generic_rule",
+    srcs = ["generic_rule.bzl"],
+    deps = [
+        ":toolchain_info",
+        "//toolchains/private:action",
+        "//toolchains/private:collect",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "mutually_exclusive_category",
+    srcs = ["mutually_exclusive_category.bzl"],
+    deps = [":toolchain_info"],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "tool",
+    srcs = ["tool.bzl"],
+    deps = [
+        ":toolchain_info",
+        "//toolchains/private:collect",
+        "@bazel_skylib//rules/directory:providers",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "tool_capability",
+    srcs = ["tool_capability.bzl"],
+    deps = [
+        ":toolchain_info",
+        "//toolchains/private:small_set",
+    ],
+    visibility = ["//visibility:public"],
+
+)
+
+bzl_library(
+    name = "tool_map",
+    srcs = ["tool_map.bzl"],
+    deps = [
+        ":toolchain_info",
+        "//toolchains/private:collect",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "toolchain_config",
+    srcs = ["toolchain_config.bzl"],
+    deps = [
+        ":toolchain_info",
+        "//toolchains/private:action",
+        "//toolchains/private:collect",
+        "//toolchains/private:features",
+        "//toolchains/private:small_set",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "toolchain_info",
+    srcs = ["toolchain_info.bzl"],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "variables",
+    srcs = ["variables.bzl"],
+    deps = [
+        ":toolchain_info",
+        "//toolchains/private:collect",
+    ],
     visibility = ["//visibility:public"],
 )
