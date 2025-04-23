@@ -3,7 +3,7 @@ package(default_visibility = ["//visibility:public"])
 
 constraint_setting(
     name = "current_platform",
-    default_constraint_value = ":host"
+    default_constraint_value = ":host",
 )
 
 constraint_value(
@@ -14,7 +14,7 @@ constraint_value(
 # For now, we're just exec'ing on the host platform.
 alias(
     name = "is_exec",
-    actual = ":host"
+    actual = ":host",
 )
 
 constraint_value(

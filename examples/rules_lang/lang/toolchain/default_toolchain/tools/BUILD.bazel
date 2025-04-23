@@ -9,6 +9,7 @@ alias(
         # This would normally be defined in a repo rule to allow you to fetch the compiler from the network.
         "@rules_toolchains//tests/platforms:exec1": "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
         "@rules_toolchains//tests/platforms:exec2": "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
+        "@rules_toolchains//tests/platforms:host": "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
         "//conditions:default": "@platforms//:incompatible",
     }),
     # Manual because we require a transition to the exec platform.
@@ -22,6 +23,7 @@ alias(
         # This would normally be defined in a repo rule to allow you to fetch the compiler from the network.
         "@rules_toolchains//tests/platforms:exec1": "//lang/toolchain/default_toolchain/tools/linux_x64:link_tool",
         "@rules_toolchains//tests/platforms:exec2": "//lang/toolchain/default_toolchain/tools/linux_x64:link_tool",
+        "@rules_toolchains//tests/platforms:host": "//lang/toolchain/default_toolchain/tools/linux_x64:link_tool",
         "//conditions:default": "@platforms//:incompatible",
     }),
     # Manual because we require a transition to the exec platform.

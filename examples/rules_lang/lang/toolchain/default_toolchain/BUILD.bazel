@@ -8,12 +8,10 @@ toolchain(
         "//lang/toolchain/args:default_args",
         "//lang/toolchain/features:feature1",
     ],
-    exec_platforms = {
-        "@rules_toolchains//tests/platforms:exec_platform1":
-        # Lie to it to convince it that when we're on the host platform, we're actually on the exec platform.
-        # This allows us to test that the transition is working as intended.
-        ["@rules_toolchains//tests/platforms:host"],
-        "@rules_toolchains//tests/platforms:exec_platform2": ["@rules_toolchains//tests/platforms:exec2"],
+    exec_constraint_groups = {
+        "exec_host": ["@rules_toolchains//tests/platforms:host"],
+        "exec_platform1": ["@rules_toolchains//tests/platforms:exec1"],
+        "exec_platform2": ["@rules_toolchains//tests/platforms:exec2"],
     },
     # If you have tools such as clang which have seperate binaries per exec-target pair (eg. gcc-<exec>-<target>),
     # you can perform a select here over the target platform, and perform a select over the exec platform in the tool.
