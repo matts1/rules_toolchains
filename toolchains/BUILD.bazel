@@ -17,120 +17,120 @@ load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 bzl_library(
     name = "actions",
     srcs = ["actions.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
         "//toolchains/private:collect",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzl_library(
     name = "args",
     srcs = ["args.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
         "//toolchains/private:collect",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzl_library(
     name = "args_list",
     srcs = ["args_list.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
         "//toolchains/private:collect",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzl_library(
     name = "feature",
     srcs = ["feature.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
         "//toolchains/private:collect",
         "//toolchains/private:small_set",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzl_library(
     name = "feature_constraint",
     srcs = ["feature_set.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
         "//toolchains/private:collect",
         "//toolchains/private:features",
         "//toolchains/private:small_set",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzl_library(
     name = "feature_set",
     srcs = ["feature_set.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
         "//toolchains/private:collect",
         "//toolchains/private:features",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzl_library(
     name = "generic_rule",
     srcs = ["generic_rule.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
         "//toolchains/private:action",
         "//toolchains/private:collect",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzl_library(
     name = "mutually_exclusive_category",
     srcs = ["mutually_exclusive_category.bzl"],
-    deps = [":toolchain_info"],
     visibility = ["//visibility:public"],
+    deps = [":toolchain_info"],
 )
 
 bzl_library(
     name = "tool",
     srcs = ["tool.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
         "//toolchains/private:collect",
         "@bazel_skylib//rules/directory:providers",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzl_library(
     name = "tool_capability",
     srcs = ["tool_capability.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
         "//toolchains/private:small_set",
     ],
-    visibility = ["//visibility:public"],
-
 )
 
 bzl_library(
     name = "tool_map",
     srcs = ["tool_map.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
         "//toolchains/private:collect",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzl_library(
-    name = "toolchain_config",
-    srcs = ["toolchain_config.bzl"],
+    name = "toolchain",
+    srcs = ["toolchain.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
         "//toolchains/private:action",
@@ -138,7 +138,6 @@ bzl_library(
         "//toolchains/private:features",
         "//toolchains/private:small_set",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzl_library(
@@ -150,9 +149,14 @@ bzl_library(
 bzl_library(
     name = "variables",
     srcs = ["variables.bzl"],
+    visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
         "//toolchains/private:collect",
     ],
-    visibility = ["//visibility:public"],
+)
+
+exports_files(
+    glob(["*.bzl"]),
+    visibility = ["//docs:__pkg__"],
 )

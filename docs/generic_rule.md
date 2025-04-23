@@ -1,6 +1,6 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-
+The API for creating generic rules based on running actions.
 
 <a id="run_action"></a>
 

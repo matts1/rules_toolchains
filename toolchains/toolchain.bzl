@@ -25,21 +25,40 @@ load("//toolchains/private:features.bzl", "get_features")
 
 visibility("public")
 
-_PLATFORM = "//command_line_option:platforms"
-_NO_EXEC_PLATFORM_ERROR = """You must specify an execution platform for your toolchain.
+LINUX_AMD64 = ["@platforms//os:linux", "@platforms//cpu:x86_64"]
+LINUX_ARM64 = ["@platforms//os:linux", "@platforms//cpu:aarch64"]
+MAC_AMD64 = ["@platforms//os:osx", "@platforms//cpu:x86_64"]
+MAC_ARM64 = ["@platforms//os:osx", "@platforms//cpu:aarch64"]
+WINDOWS_AMD64 = ["@platforms//os:windows", "@platforms//cpu:x86_64"]
+WINDOWS_ARM64 = ["@platforms//os:windows", "@platforms//cpu:aarch64"]
 
-If you have no remote execution configured, set exec_platforms = {"@platforms//host: []}
-
-If you do have remote execution, each remote execution platform must be listed below.
-For example, given the platform
-```
-platform(name = "linux_amd64", constraints = ["@platforms//os:linux", "@platforms//cpu:x86_64"])
-```
-
-You would write {
-    "//path/to:linux_amd64": ["@platforms//os:linux", "@platforms//cpu:x86_64"]
+NO_REMOTE_EXECUTION = {None: []}
+DEFAULT_EXEC_CONSTRAINT_GROUPS = {
+    "linux_amd64": LINUX_AMD64,
+    "linux_arm64": LINUX_ARM64,
+    "mac_amd64": MAC_AMD64,
+    "mac_arm64": MAC_ARM64,
+    "windows_amd64": WINDOWS_AMD64,
+    "windows_arm64": WINDOWS_ARM64,
 }
-        """
+
+_PLATFORM = "//command_line_option:platforms"
+_NO_EXEC_CONSTRAINT_GROUPS_ERROR = """You did not specify a set of execution platforms for your toolchain.
+
+This is needed if you are using remote execution. If you don't intend to use remote execution, set exec_constraint_groups = NO_REMOTE_EXECUTION
+
+If you do have remote execution, each execution platform (both remote and local) that might result in a different configuration (eg. different tool binaries) should be listed.
+
+A reasonable set of defaults is DEFAULT_EXEC_PLATFORMS, which provides amd64 and arm64 variants for linux, mac, and windows.
+
+For example, if all your devs use linux amd64 machines locally, and your remote execution machines are linux arm64 machines, you would write:
+```
+{
+    "linux_amd64": ["@platforms//os:linux", "@platforms//cpu:x86_64"]
+    "linux_arm64": ["@platforms//os:linux", "@platforms//cpu:aarch64"]
+}
+```
+"""
 
 def _create_toolchain(*, label, enabled_features, tool_map):
     capabilities_to_features = {}
@@ -74,12 +93,12 @@ def _toolchain_config_impl(ctx):
     ]
 
 def _exec_platform_impl(_, attr):
-    return {_PLATFORM: str(attr.exec_platform), "//command_line_option:cpu": "aarch64"}
+    return {_PLATFORM: str(attr.exec_platform)}
 
 _exec_platform = transition(
     implementation = _exec_platform_impl,
     inputs = [],
-    outputs = [_PLATFORM, "//command_line_option:cpu"],
+    outputs = [_PLATFORM],
 )
 
 _toolchain_config = rule(
@@ -100,32 +119,49 @@ _toolchain_config = rule(
 )
 
 def toolchain(
-    name,
-    default_features,
-    tool_map,
-    toolchain_type,
-    exec_platforms = None,
-):
-    if not exec_platforms:
-        fail(_NO_EXEC_PLATFORM_ERROR)
-    for platform, constraints in exec_platforms.items():
-        platform = native.package_relative_label(platform)
+        name,
+        default_features,
+        tool_map,
+        toolchain_type,
+        exec_constraint_groups = None):
+    """Toolchain for a given toolchain type.
 
-        toolchain_name = "%s_%s" % (name, platform.name)
+    Args:
+        name: (str) The prefix given to all toolchains.
+          This will create one toolchain target per exec platform.
+        default_features: (List[Label]) A list of labels corresponding to
+          features that are enabled by default.
+        tool_map: (Label) A tool map created by the `tool_map` rule.
+        toolchain_type: (Label) The type of toolchain this corresponds to.
+        exec_constraint_groups: (Dict[str, List[Label]])
+          A mapping from toolchain suffix to a list of constraints.
+    """
+    if not exec_constraint_groups:
+        fail(_NO_EXEC_CONSTRAINT_GROUPS_ERROR)
+    for suffix, constraints in exec_constraint_groups.items():
+        toolchain_name = name if suffix == None else "%s_%s" % (name, suffix)
         config_name = "_%s_config" % toolchain_name
+        platform_name = "_%s_platform" % toolchain_name
+
+        # This is a fake platform used purely to transition specific constraint values,
+        # as it is difficult to transition on constraint values directly.
+        native.platform(
+            name = platform_name,
+            constraint_values = constraints,
+            visibility = ["//visibility:private"],
+        )
 
         _toolchain_config(
             name = config_name,
             default_features = default_features,
             tool_map = tool_map,
-            exec_platform = platform,
+            exec_platform = platform_name,
+            visibility = ["//visibility:private"],
         )
 
         native.toolchain(
             name = toolchain_name,
             toolchain = config_name,
             toolchain_type = toolchain_type,
-            # It'd be nice to be able to just pass the platform itself as a constraint.
-            # See github.com/bazelbuild/bazel/issues/25363
             exec_compatible_with = constraints,
         )
