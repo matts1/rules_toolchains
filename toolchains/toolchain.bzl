@@ -42,7 +42,6 @@ DEFAULT_EXEC_CONSTRAINT_GROUPS = {
     "windows_arm64": WINDOWS_ARM64,
 }
 
-_PLATFORM = "//command_line_option:platforms"
 _NO_EXEC_CONSTRAINT_GROUPS_ERROR = """You did not specify a set of execution platforms for your toolchain.
 
 This is needed if you are using remote execution. If you don't intend to use remote execution, set exec_constraint_groups = NO_REMOTE_EXECUTION
@@ -84,22 +83,13 @@ def _toolchain_config_impl(ctx):
     toolchain_config = _create_toolchain(
         label = ctx.label,
         enabled_features = collect_features(collect_provider(ctx.attr.default_features, FeatureSetInfo)),
-        tool_map = ctx.attr.tool_map[0][ToolMapInfo],
+        tool_map = ctx.attr.tool_map[ToolMapInfo],
     )
 
     return [
         toolchain_config,
         platform_common.ToolchainInfo(config = toolchain_config),
     ]
-
-def _exec_platform_impl(_, attr):
-    return {_PLATFORM: str(attr.exec_platform)}
-
-_exec_platform = transition(
-    implementation = _exec_platform_impl,
-    inputs = [],
-    outputs = [_PLATFORM],
-)
 
 _toolchain_config = rule(
     implementation = _toolchain_config_impl,
@@ -110,10 +100,7 @@ _toolchain_config = rule(
         # features and make the visibility of the feature private so no-one
         # can turn it off.
         "default_features": attr.label_list(providers = [FeatureSetInfo]),
-        # cfg = "exec" does not work
-        # https://github.com/bazelbuild/rules_cc/issues/299#issuecomment-2659621078
-        "tool_map": attr.label(providers = [ToolMapInfo], cfg = _exec_platform, mandatory = True),
-        "exec_platform": attr.label(providers = [platform_common.PlatformInfo], mandatory = True),
+        "tool_map": attr.label(providers = [ToolMapInfo], cfg = "exec", mandatory = True),
     },
     provides = [platform_common.ToolchainInfo],
 )
@@ -136,28 +123,18 @@ def toolchain(
         exec_constraint_groups: (Dict[str, List[Label]])
           A mapping from toolchain suffix to a list of constraints.
     """
+    config_name = "_%s_config" % name
+    _toolchain_config(
+        name = config_name,
+        default_features = default_features,
+        tool_map = tool_map,
+        visibility = ["//visibility:private"],
+    )
+
     if not exec_constraint_groups:
         fail(_NO_EXEC_CONSTRAINT_GROUPS_ERROR)
     for suffix, constraints in exec_constraint_groups.items():
         toolchain_name = name if suffix == None else "%s_%s" % (name, suffix)
-        config_name = "_%s_config" % toolchain_name
-        platform_name = "_%s_platform" % toolchain_name
-
-        # This is a fake platform used purely to transition specific constraint values,
-        # as it is difficult to transition on constraint values directly.
-        native.platform(
-            name = platform_name,
-            constraint_values = constraints,
-            visibility = ["//visibility:private"],
-        )
-
-        _toolchain_config(
-            name = config_name,
-            default_features = default_features,
-            tool_map = tool_map,
-            exec_platform = platform_name,
-            visibility = ["//visibility:private"],
-        )
 
         native.toolchain(
             name = toolchain_name,

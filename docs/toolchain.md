@@ -23,6 +23,6 @@ Toolchain for a given toolchain type.
 | <a id="toolchain-default_features"></a>default_features |  (List[Label]) A list of labels corresponding to features that are enabled by default.   |  none |
 | <a id="toolchain-tool_map"></a>tool_map |  (Label) A tool map created by the `tool_map` rule.   |  none |
 | <a id="toolchain-toolchain_type"></a>toolchain_type |  (Label) The type of toolchain this corresponds to.   |  none |
-| <a id="toolchain-exec_constraint_groups"></a>exec_constraint_groups |  <p align="center"> - </p>   |  `None` |
+| <a id="toolchain-exec_constraint_groups"></a>exec_constraint_groups |  (Dict[str, List[Label]]) A mapping from toolchain suffix to a list of constraints.   |  `None` |
 
 
