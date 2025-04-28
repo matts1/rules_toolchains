@@ -1,4 +1,7 @@
-8.1.0
+7.6.1
+# CI breaks when updating this file to bazel 8.
+# See https://github.com/bazel-contrib/rules-template/issues/138
+
 # The first line of this file is used by Bazelisk and Bazel to be sure
 # the right version of Bazel is used to build and test this repo.
 # This also defines which version is used on CI.
