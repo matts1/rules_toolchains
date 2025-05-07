@@ -13,10 +13,6 @@
 # limitations under the License.
 """Implementation of the feature_constraint rule."""
 
-load(
-    "//toolchains/private:collect.bzl",
-    "collect_provider",
-)
 load("//toolchains/private:features.bzl", "create_constraint")
 load(
     ":toolchain_info.bzl",
@@ -28,9 +24,9 @@ def _feature_constraint_impl(ctx):
         fail("Features is a reserved attribute in bazel. Use the attributes `all_of` and `none_of` for feature constraints")
     return [create_constraint(
         label = ctx.label,
-        all_of = collect_provider(ctx.attr.all_of, FeatureConstraintInfo),
-        any_of = collect_provider(ctx.attr.any_of, FeatureConstraintInfo),
-        none_of = collect_provider(ctx.attr.none_of, FeatureConstraintInfo),
+        all_of = [target[FeatureConstraintInfo] for target in ctx.attr.all_of],
+        any_of = [target[FeatureConstraintInfo] for target in ctx.attr.any_of],
+        none_of = [target[FeatureConstraintInfo] for target in ctx.attr.none_of],
     )]
 
 feature_constraint = rule(

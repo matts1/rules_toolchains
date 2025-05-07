@@ -20,7 +20,7 @@ load(
     "ToolchainConfigInfo",
 )
 load("//toolchains/private:action.bzl", "resolve_action")
-load("//toolchains/private:collect.bzl", "collect_features", "collect_provider")
+load("//toolchains/private:collect.bzl", "collect_features")
 load("//toolchains/private:features.bzl", "get_features")
 
 visibility("public")
@@ -82,7 +82,7 @@ def _toolchain_config_impl(ctx):
 
     toolchain_config = _create_toolchain(
         label = ctx.label,
-        enabled_features = collect_features(collect_provider(ctx.attr.default_features, FeatureSetInfo)),
+        enabled_features = collect_features([target[FeatureSetInfo] for target in ctx.attr.default_features]),
         tool_map = ctx.attr.tool_map[ToolMapInfo],
     )
 

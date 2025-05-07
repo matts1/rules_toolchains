@@ -17,7 +17,6 @@ load(
     "//toolchains/private:collect.bzl",
     "collect_args_lists",
     "collect_features",
-    "collect_provider",
 )
 load("//toolchains/private:small_set.bzl", "create_small_set")
 load(
@@ -34,15 +33,9 @@ def _feature_impl(ctx):
     feature = FeatureInfo(
         label = ctx.label,
         args = args,
-        implies = collect_features(collect_provider(ctx.attr.implies, FeatureSetInfo)),
-        requires = tuple(collect_provider(
-            ctx.attr.requires,
-            FeatureConstraintInfo,
-        )),
-        mutually_exclusive = tuple(collect_provider(
-            ctx.attr.mutually_exclusive,
-            MutuallyExclusiveCategoryInfo,
-        )),
+        implies = collect_features([target[FeatureSetInfo] for target in ctx.attr.implies]),
+        requires = tuple([target[FeatureConstraintInfo] for target in ctx.attr.requires]),
+        mutually_exclusive = tuple([target[MutuallyExclusiveCategoryInfo] for target in ctx.attr.mutually_exclusive]),
     )
 
     feature_set = create_small_set([feature])

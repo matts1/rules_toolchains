@@ -13,7 +13,7 @@
 # limitations under the License.
 """Implementation of tool"""
 
-load("//toolchains/private:collect.bzl", "collect_data", "collect_provider")
+load("//toolchains/private:collect.bzl", "collect_data")
 load(
     ":toolchain_info.bzl",
     "ToolCapabilityInfo",
@@ -35,7 +35,7 @@ def _tool_impl(ctx):
         exe = exe,
         files_to_run = data,
         execution_requirements = ctx.attr.execution_requirements,
-        capabilities = tuple(collect_provider(ctx.attr.capabilities, ToolCapabilityInfo)),
+        capabilities = tuple([target[ToolCapabilityInfo] for target in ctx.attr.capabilities]),
     )
 
     link = ctx.actions.declare_file(ctx.label.name)

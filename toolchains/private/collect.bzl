@@ -26,33 +26,12 @@ visibility([
     "//tests/...",
 ])
 
-def collect_provider(targets, provider):
-    """Collects providers from a label list.
-
-    Args:
-        targets: (List[Target]) An attribute from attr.label_list
-        provider: (provider) The provider to look up
-    Returns:
-        A list of the providers
-    """
-    return [target[provider] for target in targets]
-
-def collect_defaultinfo(targets):
-    """Collects DefaultInfo from a label list.
-
-    Args:
-        targets: (List[Target]) An attribute from attr.label_list
-    Returns:
-        A list of the associated defaultinfo
-    """
-    return collect_provider(targets, DefaultInfo)
-
 def _make_collector(provider, field):
     def collector(targets, direct = [], transitive = []):
         # Avoid mutating what was passed in.
         transitive = transitive[:]
-        for value in collect_provider(targets, provider):
-            transitive.append(getattr(value, field))
+        for target in targets:
+            transitive.append(getattr(target[provider], field))
         return depset(direct = direct, transitive = transitive)
 
     return collector
@@ -78,7 +57,8 @@ def collect_data(targets):
         required to run them.
     """
     out = []
-    for info in collect_defaultinfo(targets):
+    for target in targets:
+        info = target[DefaultInfo]
         if info.files_to_run != None:
             out.append(info.files_to_run)
         out.append(info.files)

@@ -2,7 +2,7 @@
 
 load("//toolchains:toolchain_info.bzl", "ArgsListInfo", "FeatureInfo", "FeatureSetInfo")
 load("//toolchains/private:action.bzl", "resolve_action_from_toolchain")
-load("//toolchains/private:collect.bzl", "collect_args_lists", "collect_provider")
+load("//toolchains/private:collect.bzl", "collect_args_lists")
 
 visibility("public")
 
@@ -49,9 +49,9 @@ def run_action(
     if ctx.attr.features:
         fail("Features is a reserved attribute in bazel. Use the attributes `enabled_features` and `disabled_features` instead")
     if enabled_features == None:
-        enabled_features = collect_provider(ctx.attr.enabled_features, FeatureInfo)
+        enabled_features = [target[FeatureInfo] for target in ctx.attr.enabled_features]
     if disabled_features == None:
-        disabled_features = collect_provider(ctx.attr.disabled_features, FeatureInfo)
+        disabled_features = [target[FeatureInfo] for target in ctx.attr.disabled_features]
     if extra_args == None:
         extra_args = collect_args_lists(ctx.attr.extra_args)
 

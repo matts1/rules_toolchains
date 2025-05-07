@@ -17,7 +17,6 @@ load(
     "//toolchains/private:collect.bzl",
     "collect_action_types",
     "collect_files",
-    "collect_provider",
 )
 load(
     ":toolchain_info.bzl",
@@ -78,7 +77,7 @@ def base_add_args_impl(ctx, fill, *, allowed_actions = None, allowed_actions_cau
     args = ArgsInfo(
         label = ctx.label,
         actions = actions,
-        requires = collect_provider(ctx.attr.requires, FeatureConstraintInfo),
+        requires = [target[FeatureConstraintInfo] for target in ctx.attr.requires],
         files = collect_files(ctx.attr.data),
         env = ctx.attr.env,
         fill = fill,

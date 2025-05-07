@@ -17,6 +17,7 @@ toolchain(
     # you can perform a select here over the target platform, and perform a select over the exec platform in the tool.
     tool_map = select({
         "@rules_toolchains//tests/platforms:target1": "//lang/toolchain/default_toolchain/tools:tool_map",
+        "@rules_toolchains//tests/platforms:target2": "//lang/toolchain/default_toolchain/tools:empty_tool_map",
         "//conditions:default": "@platforms//:incompatible",
     }),
     toolchain_type = "//lang/toolchain:toolchain_type",

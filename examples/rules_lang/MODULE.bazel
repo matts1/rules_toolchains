@@ -6,6 +6,8 @@ bazel_dep(
 )
 bazel_dep(name = "platforms", version = "0.0.10")
 
+bazel_dep(name = "rules_testing", version = "0.6.0", dev_dependency = True)
+
 local_path_override(
     module_name = "rules_toolchains",
     path = "../..",

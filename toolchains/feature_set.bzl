@@ -13,7 +13,7 @@
 # limitations under the License.
 """Implementation of the feature_set rule."""
 
-load("//toolchains/private:collect.bzl", "collect_features", "collect_provider")
+load("//toolchains/private:collect.bzl", "collect_features")
 load("//toolchains/private:features.bzl", "create_constraint")
 load(
     ":toolchain_info.bzl",
@@ -24,8 +24,8 @@ load(
 def _feature_set_impl(ctx):
     if ctx.attr.features:
         fail("Features is a reserved attribute in bazel. feature_set takes `all_of` instead.")
-    features = collect_features(collect_provider(ctx.attr.all_of, FeatureSetInfo))
-    constraints = collect_provider(ctx.attr.all_of, FeatureConstraintInfo)
+    features = collect_features([target[FeatureSetInfo] for target in ctx.attr.all_of])
+    constraints = [target[FeatureConstraintInfo] for target in ctx.attr.all_of]
     return [
         FeatureSetInfo(label = ctx.label, features = features),
         create_constraint(

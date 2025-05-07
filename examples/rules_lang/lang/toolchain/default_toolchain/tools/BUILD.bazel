@@ -2,6 +2,9 @@ load("@rules_toolchains//toolchains:tool_map.bzl", "tool_map")
 
 package(default_visibility = ["//visibility:public"])
 
+# The following targets are all marked as manual to ensure that you don't build them
+# when running `bazel build //...` or similar.
+# You wouldn't want that because they need to be built for the exec platform, not the target platform.
 alias(
     name = "compile_tool",
     # actual = "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
@@ -12,8 +15,6 @@ alias(
         "@rules_toolchains//tests/platforms:host": "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
         "//conditions:default": "@platforms//:incompatible",
     }),
-    # Manual because we require a transition to the exec platform.
-    # You shouldn't need this.
     tags = ["manual"],
 )
 
@@ -26,18 +27,20 @@ alias(
         "@rules_toolchains//tests/platforms:host": "//lang/toolchain/default_toolchain/tools/linux_x64:link_tool",
         "//conditions:default": "@platforms//:incompatible",
     }),
-    # Manual because we require a transition to the exec platform.
-    # You shouldn't need this.
     tags = ["manual"],
 )
 
 tool_map(
     name = "tool_map",
-    # Manual because we require a transition to the exec platform.
-    # You shouldn't need this.
     tags = ["manual"],
     tools = {
         "//lang/toolchain/actions:compile": ":compile_tool",
         "//lang/toolchain/actions:link": ":link_tool",
     },
+)
+
+tool_map(
+    name = "empty_tool_map",
+    tags = ["manual"],
+    tools = {},
 )

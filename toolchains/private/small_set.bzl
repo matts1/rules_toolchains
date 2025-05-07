@@ -9,7 +9,7 @@ def create_small_set(values):
         values: (Sequence[provider]) Values to merge
 
     Returns:
-        A deduplicated set small set of providers.
+        A deduplicated set of providers.
     """
 
     # dedup

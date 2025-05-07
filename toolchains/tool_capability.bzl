@@ -21,6 +21,11 @@ load(
     "ToolCapabilityInfo",
 )
 
+def _validate(self, features):
+    if self.label not in features:
+        return "%s is unsupported by the current tool" % self.label
+    return None
+
 def _tool_capability_impl(ctx):
     ft = FeatureInfo(
         label = ctx.label,
@@ -30,11 +35,6 @@ def _tool_capability_impl(ctx):
         mutually_exclusive = (),
     )
 
-    def validate(self, features):
-        if self.label not in features:
-            return "%s is unsupported by the current tool" % self.label
-        return None
-
     return [
         ToolCapabilityInfo(label = ctx.label, feature = ft),
         # Only give it a feature constraint info and not a feature info.
@@ -42,7 +42,7 @@ def _tool_capability_impl(ctx):
         FeatureConstraintInfo(
             label = ctx.label,
             storage = None,
-            validate = validate,
+            validate = _validate,
         ),
     ]
 

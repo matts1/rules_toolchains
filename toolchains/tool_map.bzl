@@ -15,7 +15,6 @@
 
 load(
     "//toolchains/private:collect.bzl",
-    "collect_provider",
     "collect_tools",
 )
 load(
@@ -26,12 +25,11 @@ load(
 
 def _tool_map_impl(ctx):
     tools = collect_tools(ctx, ctx.attr.tools)
-    action_sets = collect_provider(ctx.attr.actions, ActionTypeSetInfo)
+    action_sets = [target[ActionTypeSetInfo] for target in ctx.attr.actions]
 
     action_to_tool = {}
     action_to_as = {}
-    for i in range(len(action_sets)):
-        action_set = action_sets[i]
+    for i, action_set in enumerate(action_sets):
         tool = tools[ctx.attr.tool_index_for_action[i]]
 
         for action in action_set.actions.to_list():
