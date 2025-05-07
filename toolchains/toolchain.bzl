@@ -65,7 +65,7 @@ def _create_toolchain(*, label, enabled_features, tool_map):
     for action_type, tool in tool_map.configs.items():
         capabilities = tuple(sorted([cap.label for cap in tool.capabilities]))
         if capabilities not in capabilities_to_features:
-            capabilities_to_features[capabilities] = get_features(list(enabled_features) + [cap.feature for cap in tool.capabilities], [], [])
+            capabilities_to_features[capabilities] = get_features(enabled_features + [cap.feature for cap in tool.capabilities], [], [])
         features = capabilities_to_features[capabilities]
         defaults[action_type] = resolve_action(action_type = action_type, features = features, extra_args = [])
 
@@ -82,7 +82,7 @@ def _toolchain_config_impl(ctx):
 
     toolchain_config = _create_toolchain(
         label = ctx.label,
-        enabled_features = collect_features([target[FeatureSetInfo] for target in ctx.attr.default_features]),
+        enabled_features = collect_features(ctx.attr.default_features).to_list(),
         tool_map = ctx.attr.tool_map[ToolMapInfo],
     )
 

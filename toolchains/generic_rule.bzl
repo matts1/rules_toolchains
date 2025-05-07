@@ -20,6 +20,9 @@ def run_action(
         extra_args = None,
         extra_inputs = [],
         extra_outputs = [],
+        exec_group = None,
+        resource_set = None,
+        toolchain_type = None,
         inputs_file = None):
     """Calls ctx.actions.run with the appropriate CLI based on toolchain config.
 
@@ -43,6 +46,10 @@ def run_action(
           been explicitly added for this action only.
         extra_inputs: (Sequence[File]) Additional inputs to this action.
         extra_outputs: (Sequence[File]) Additional outputs to this action.
+        exec_group: (Optional[string]) Passed through to ctx.actions.run
+        resource_set: (Optional[Callback]) Passed through to ctx.actions.run
+        toolchain_type: (Optional[Label]) Passed through to
+          ctx.actions.run(toolchain = toolchain_type)
         inputs_file: (Optional[File]) If provided, this file will be filled
           with all inputs to this action.
     """
@@ -95,6 +102,9 @@ def run_action(
         tools = tool.files_to_run,
         inputs = inputs,
         execution_requirements = execution_ctx.execution_requirements,
+        resource_set = resource_set,
+        exec_group = exec_group,
+        toolchain = toolchain_type,
     )
 
     if inputs_file:

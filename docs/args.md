@@ -48,8 +48,8 @@ args_add(
 <pre>
 load("@rules_toolchains//toolchains:args.bzl", "args_add_all")
 
-args_add_all(<a href="#args_add_all-name">name</a>, <a href="#args_add_all-data">data</a>, <a href="#args_add_all-actions">actions</a>, <a href="#args_add_all-allow_closure">allow_closure</a>, <a href="#args_add_all-arg_name">arg_name</a>, <a href="#args_add_all-before_each">before_each</a>, <a href="#args_add_all-env">env</a>, <a href="#args_add_all-expand_directories">expand_directories</a>,
-             <a href="#args_add_all-format_each">format_each</a>, <a href="#args_add_all-omit_if_empty">omit_if_empty</a>, <a href="#args_add_all-requires">requires</a>, <a href="#args_add_all-terminate_with">terminate_with</a>, <a href="#args_add_all-uniquify">uniquify</a>, <a href="#args_add_all-value">value</a>)
+args_add_all(<a href="#args_add_all-name">name</a>, <a href="#args_add_all-data">data</a>, <a href="#args_add_all-actions">actions</a>, <a href="#args_add_all-arg_name">arg_name</a>, <a href="#args_add_all-before_each">before_each</a>, <a href="#args_add_all-env">env</a>, <a href="#args_add_all-expand_directories">expand_directories</a>, <a href="#args_add_all-format_each">format_each</a>,
+             <a href="#args_add_all-omit_if_empty">omit_if_empty</a>, <a href="#args_add_all-requires">requires</a>, <a href="#args_add_all-terminate_with">terminate_with</a>, <a href="#args_add_all-uniquify">uniquify</a>, <a href="#args_add_all-value">value</a>)
 </pre>
 
 Roughly equivalent to `ctx.actions.args().add_all()`.
@@ -74,7 +74,6 @@ args_add_all(
 | <a id="args_add_all-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
 | <a id="args_add_all-data"></a>data |  Data required for the arg. This does not include variables.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
 | <a id="args_add_all-actions"></a>actions |  The actions for which this arg is used. This arg will be skipped for all actions other than the ones listed here.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | required |  |
-| <a id="args_add_all-allow_closure"></a>allow_closure |  -   | Boolean | optional |  `False`  |
 | <a id="args_add_all-arg_name"></a>arg_name |  -   | String | optional |  `""`  |
 | <a id="args_add_all-before_each"></a>before_each |  -   | String | optional |  `""`  |
 | <a id="args_add_all-env"></a>env |  Environment variables to apply.   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | optional |  `{}`  |

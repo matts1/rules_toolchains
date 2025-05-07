@@ -30,6 +30,9 @@ def _tool_impl(ctx):
         fail("Expected tool's src attribute to be either an executable or a single file")
 
     data = collect_data(ctx.attr.data + [ctx.attr.src])
+    if exe_info.files_to_run != None:
+        data.append(exe_info.files_to_run)
+
     tool = ToolInfo(
         label = ctx.label,
         exe = exe,

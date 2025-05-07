@@ -24,7 +24,7 @@ load(
 def _feature_set_impl(ctx):
     if ctx.attr.features:
         fail("Features is a reserved attribute in bazel. feature_set takes `all_of` instead.")
-    features = collect_features([target[FeatureSetInfo] for target in ctx.attr.all_of])
+    features = collect_features(ctx.attr.all_of)
     constraints = [target[FeatureConstraintInfo] for target in ctx.attr.all_of]
     return [
         FeatureSetInfo(label = ctx.label, features = features),

@@ -13,7 +13,6 @@
 # limitations under the License.
 """Implementation of the tool_capability rule."""
 
-load("//toolchains/private:small_set.bzl", "EMPTY_SMALL_SET")
 load(
     ":toolchain_info.bzl",
     "FeatureConstraintInfo",
@@ -29,8 +28,8 @@ def _validate(self, features):
 def _tool_capability_impl(ctx):
     ft = FeatureInfo(
         label = ctx.label,
-        args = EMPTY_SMALL_SET,
-        implies = EMPTY_SMALL_SET,
+        args = (),
+        implies = (),
         requires = (),
         mutually_exclusive = (),
     )

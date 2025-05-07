@@ -99,6 +99,28 @@ def validate_features(features):
                 fail("%s and %s are mutually exclusive (due to the category %s)" % (categories[category.label], ft.label, category.label))
             categories[category.label] = ft.label
 
+def _validate(self, features):
+    for constraint in self.storage.all_of:
+        err = constraint.validate(constraint, features)
+        if err != None:
+            return "%s is unmet because %s" % (self.label, err)
+
+    for constraint in self.storage.none_of:
+        err = constraint.validate(constraint, features)
+        if err == None:
+            return "%s is unmet because %s is met" % (self.label, constraint.label)
+
+    errors = []
+    for constraint in self.storage.any_of:
+        err = constraint.validate(constraint, features)
+        if err == None:
+            return None
+        errors.append(err)
+
+    if not errors:
+        return None
+    return "%s is unmet because %s" % (self.label, " and ".join(["(%s)" % err for err in errors]))
+
 def create_constraint(*, label, all_of, any_of, none_of):
     """Creates a constraint matching some conditions of other constraints.
 
@@ -115,28 +137,6 @@ def create_constraint(*, label, all_of, any_of, none_of):
         A FeatureConstraintInfo
     """
 
-    def validate(self, features):
-        for constraint in self.storage.all_of:
-            err = constraint.validate(constraint, features)
-            if err != None:
-                return "%s is unmet because %s" % (self.label, err)
-
-        for constraint in self.storage.none_of:
-            err = constraint.validate(constraint, features)
-            if err == None:
-                return "%s is unmet because %s is met" % (self.label, constraint.label)
-
-        errors = []
-        for constraint in self.storage.any_of:
-            err = constraint.validate(constraint, features)
-            if err == None:
-                return None
-            errors.append(err)
-
-        if not errors:
-            return None
-        return "%s is unmet because %s" % (self.label, " and ".join(["(%s)" % err for err in errors]))
-
     return FeatureConstraintInfo(
         label = label,
         storage = struct(
@@ -144,7 +144,7 @@ def create_constraint(*, label, all_of, any_of, none_of):
             any_of = any_of,
             none_of = none_of,
         ),
-        validate = validate,
+        validate = _validate,
     )
 
 def validate_requires(*, features, requirer, constraints):
