@@ -51,7 +51,6 @@ bzl_library(
     deps = [
         ":toolchain_info",
         "//toolchains/private:collect",
-        "//toolchains/private:small_set",
     ],
 )
 
@@ -63,7 +62,6 @@ bzl_library(
         ":toolchain_info",
         "//toolchains/private:collect",
         "//toolchains/private:features",
-        "//toolchains/private:small_set",
     ],
 )
 
@@ -113,7 +111,6 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         ":toolchain_info",
-        "//toolchains/private:small_set",
     ],
 )
 
@@ -136,7 +133,6 @@ bzl_library(
         "//toolchains/private:action",
         "//toolchains/private:collect",
         "//toolchains/private:features",
-        "//toolchains/private:small_set",
     ],
 )
 

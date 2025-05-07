@@ -54,6 +54,14 @@ COMMON_ATTRS = {
     ),
 }
 
+def _update_env(self, execution_ctx):
+    for k, v in self.env.items():
+        # TODO: Reconsider the decision on whether collisions are allowed.
+        # I'm on the fence, but it's much easier to allow something previously disallowed than the other way around.
+        if k in execution_ctx.env:
+            fail(self.label, "sets %r to %r, but it was already defined as %r" % (k, v, execution_ctx.env[k]))
+        execution_ctx.env[k] = v
+
 def base_add_args_impl(ctx, fill, *, allowed_actions = None, allowed_actions_cause = None, storage = None):
     """A basic implementation of args recommended to be used by all custom rules.
 
@@ -91,7 +99,7 @@ def base_add_args_impl(ctx, fill, *, allowed_actions = None, allowed_actions_cau
 def _args_add_strings_impl(ctx):
     def fill(self, execution_ctx, args):
         args.add_all(self.storage)
-        execution_ctx.env.update(self.env)
+        _update_env(self, execution_ctx)
 
     return base_add_args_impl(ctx, fill, allowed_actions = None, allowed_actions_cause = None, storage = ctx.attr.values)
 
@@ -127,7 +135,7 @@ def _args_add_impl(ctx):
                 args.add(self.storage.arg_name, value, format = self.storage.format)
             else:
                 args.add(value, format = self.storage.format)
-            execution_ctx.env.update(self.env)
+            _update_env(self, execution_ctx)
             if variable.type == TYPE_INPUT_FILE:
                 execution_ctx.inputs.append(value)
             elif variable.type == TYPE_OUTPUT_FILE:
@@ -182,7 +190,7 @@ def _args_add_all_impl(ctx):
             elif variable.type == TYPE_OUTPUT_FILE:
                 execution_ctx.outputs.extend(value)
         if value or not self.storage.omit_if_empty:
-            execution_ctx.env.update(self.env)
+            _update_env(self, execution_ctx)
 
     variable = ctx.attr.value[ListVariableInfo]
     return base_add_args_impl(ctx, fill, allowed_actions = variable.actions, allowed_actions_cause = variable.label, storage = struct(
@@ -214,7 +222,6 @@ args_add_all = rule(
         "uniquify": attr.bool(default = False),
         "expand_directories": attr.bool(default = True),
         "terminate_with": attr.string(),
-        "allow_closure": attr.bool(default = False),
     } | COMMON_ATTRS,
     doc = """Roughly equivalent to `ctx.actions.args().add_all()`.
 
@@ -247,7 +254,7 @@ def _args_add_joined_impl(ctx):
             elif variable.type == TYPE_OUTPUT_FILE:
                 execution_ctx.outputs.extend(value)
         if value or not self.storage.omit_if_empty:
-            execution_ctx.env.update(self.env)
+            _update_env(self, execution_ctx)
 
     variable = ctx.attr.value[ListVariableInfo]
     return base_add_args_impl(ctx, fill, allowed_actions = variable.actions, allowed_actions_cause = variable.label, storage = struct(

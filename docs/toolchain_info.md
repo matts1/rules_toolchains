@@ -149,7 +149,7 @@ A set of features
 | Name  | Description |
 | :------------- | :------------- |
 | <a id="FeatureSetInfo-label"></a>label |  (Label) The label defining this provider. Place in error messages to simplify debugging    |
-| <a id="FeatureSetInfo-features"></a>features |  (SmallSet[FeatureInfo]) The set of features this corresponds to    |
+| <a id="FeatureSetInfo-features"></a>features |  (depset[FeatureInfo]) The set of features this corresponds to    |
 
 
 <a id="ListVariableInfo"></a>

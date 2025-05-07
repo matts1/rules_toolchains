@@ -101,7 +101,7 @@ FeatureSetInfo = provider(
     # @unsorted-dict-items
     fields = {
         "label": "(Label) The label defining this provider. Place in error messages to simplify debugging",
-        "features": "(SmallSet[FeatureInfo]) The set of features this corresponds to",
+        "features": "(depset[FeatureInfo]) The set of features this corresponds to",
     },
 )
 

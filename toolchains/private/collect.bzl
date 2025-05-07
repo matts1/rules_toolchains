@@ -17,9 +17,9 @@ load(
     "//toolchains:toolchain_info.bzl",
     "ActionTypeSetInfo",
     "ArgsListInfo",
+    "FeatureSetInfo",
     "ToolInfo",
 )
-load(":small_set.bzl", "merge_small_sets")
 
 visibility([
     "//toolchains/...",
@@ -59,14 +59,15 @@ def collect_data(targets):
     out = []
     for target in targets:
         info = target[DefaultInfo]
-        if info.files_to_run != None:
-            out.append(info.files_to_run)
-        out.append(info.files)
+        if info.default_runfiles != None:
+            out.append(info.default_runfiles.files)
+        if info.files != None:
+            out.append(info.files)
 
     return out
 
-def collect_features(feature_sets):
-    return merge_small_sets([feature_set.features for feature_set in feature_sets])
+def collect_features(targets):
+    return depset(transitive = [target[FeatureSetInfo].features for target in targets])
 
 def collect_tools(ctx, targets, fail = fail):
     """Collects tools from a label_list.
