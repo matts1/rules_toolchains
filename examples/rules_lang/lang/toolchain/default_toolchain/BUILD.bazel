@@ -1,0 +1,24 @@
+load("@rules_toolchains//toolchains:toolchain.bzl", "toolchain")
+
+package(default_visibility = ["//visibility:public"])
+
+toolchain(
+    name = "toolchain",
+    default_features = [
+        "//lang/toolchain/args:default_args",
+        "//lang/toolchain/features:feature1",
+    ],
+    exec_constraint_groups = {
+        "exec_host": ["@rules_toolchains//tests/platforms:host"],
+        "exec_platform1": ["@rules_toolchains//tests/platforms:exec1"],
+        "exec_platform2": ["@rules_toolchains//tests/platforms:exec2"],
+    },
+    # If you have tools such as clang which have seperate binaries per exec-target pair (eg. gcc-<exec>-<target>),
+    # you can perform a select here over the target platform, and perform a select over the exec platform in the tool.
+    tool_map = select({
+        "@rules_toolchains//tests/platforms:target1": "//lang/toolchain/default_toolchain/tools:tool_map",
+        "@rules_toolchains//tests/platforms:target2": "//lang/toolchain/default_toolchain/tools:empty_tool_map",
+        "//conditions:default": "@platforms//:incompatible",
+    }),
+    toolchain_type = "//lang/toolchain:toolchain_type",
+)

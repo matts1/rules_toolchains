@@ -1,0 +1,46 @@
+load("@rules_toolchains//toolchains:tool_map.bzl", "tool_map")
+
+package(default_visibility = ["//visibility:public"])
+
+# The following targets are all marked as manual to ensure that you don't build them
+# when running `bazel build //...` or similar.
+# You wouldn't want that because they need to be built for the exec platform, not the target platform.
+alias(
+    name = "compile_tool",
+    # actual = "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
+    actual = select({
+        # This would normally be defined in a repo rule to allow you to fetch the compiler from the network.
+        "@rules_toolchains//tests/platforms:exec1": "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
+        "@rules_toolchains//tests/platforms:exec2": "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
+        "@rules_toolchains//tests/platforms:host": "//lang/toolchain/default_toolchain/tools/linux_x64:compile_tool",
+        "//conditions:default": "@platforms//:incompatible",
+    }),
+    tags = ["manual"],
+)
+
+alias(
+    name = "link_tool",
+    actual = select({
+        # This would normally be defined in a repo rule to allow you to fetch the compiler from the network.
+        "@rules_toolchains//tests/platforms:exec1": "//lang/toolchain/default_toolchain/tools/linux_x64:link_tool",
+        "@rules_toolchains//tests/platforms:exec2": "//lang/toolchain/default_toolchain/tools/linux_x64:link_tool",
+        "@rules_toolchains//tests/platforms:host": "//lang/toolchain/default_toolchain/tools/linux_x64:link_tool",
+        "//conditions:default": "@platforms//:incompatible",
+    }),
+    tags = ["manual"],
+)
+
+tool_map(
+    name = "tool_map",
+    tags = ["manual"],
+    tools = {
+        "//lang/toolchain/actions:compile": ":compile_tool",
+        "//lang/toolchain/actions:link": ":link_tool",
+    },
+)
+
+tool_map(
+    name = "empty_tool_map",
+    tags = ["manual"],
+    tools = {},
+)

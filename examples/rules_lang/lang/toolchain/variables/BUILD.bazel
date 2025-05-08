@@ -1,0 +1,19 @@
+load("@rules_toolchains//toolchains:variables.bzl", "input_file_list_variable", "output_file_variable")
+
+package(default_visibility = ["//visibility:public"])
+
+output_file_variable(
+    name = "output",
+    actions = ["//lang/toolchain/actions:compile_and_link"],
+    mandatory = True,
+)
+
+input_file_list_variable(
+    name = "source_files",
+    actions = ["//lang/toolchain/actions:compile"],
+)
+
+input_file_list_variable(
+    name = "shared_libraries",
+    actions = ["//lang/toolchain/actions:compile_and_link"],
+)

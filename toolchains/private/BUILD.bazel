@@ -1,19 +1,33 @@
+# This directory contains implementations of starlark functions that contain
+# complex logic. The objective is to keep the rules themselves as simple as
+# possible, so that we can perform very thorough testing on the implementation.
+
+# I wanted to call it private / internal, but then buildifier complains about
+# referencing it from the tests directory.
+
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
+package(default_visibility = ["//toolchains:__pkg__"])
+
 bzl_library(
-    name = "toolchains_repo",
-    srcs = ["toolchains_repo.bzl"],
-    visibility = ["//toolchains:__subpackages__"],
+    name = "action",
+    srcs = ["action.bzl"],
+    deps = [
+        ":collect",
+        ":features",
+    ],
 )
 
 bzl_library(
-    name = "versions",
-    srcs = ["versions.bzl"],
-    visibility = ["//toolchains:__subpackages__"],
+    name = "collect",
+    srcs = ["collect.bzl"],
+    deps = [
+        "//toolchains:toolchain_info",
+    ],
 )
 
 bzl_library(
-    name = "resolved_toolchain",
-    srcs = ["resolved_toolchain.bzl"],
-    visibility = ["//toolchains:__subpackages__"],
+    name = "features",
+    srcs = ["features.bzl"],
+    deps = ["//toolchains:toolchain_info"],
 )
