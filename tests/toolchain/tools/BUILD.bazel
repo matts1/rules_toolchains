@@ -1,0 +1,28 @@
+load("@rules_toolchains//toolchains:tool.bzl", "tool")
+load("@rules_toolchains//toolchains:tool_capability.bzl", "tool_capability")
+load("@rules_toolchains//toolchains:tool_map.bzl", "tool_map")
+
+package(default_visibility = ["//visibility:public"])
+
+tool_capability(
+    name = "capability",
+)
+
+tool(
+    name = "tool_with_capability",
+    src = "cat_tool.sh",
+    capabilities = [":capability"],
+)
+
+tool(
+    name = "simple_tool",
+    src = "cat_tool.sh",
+)
+
+tool_map(
+    name = "tool_map",
+    tools = {
+        "//tests/toolchain/actions:compile": ":tool_with_capability",
+        "//tests/toolchain/actions:link": ":simple_tool",
+    },
+)

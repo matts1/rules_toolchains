@@ -1,0 +1,20 @@
+Action: @@//tests/toolchain/actions:compile
+Tool: @@//tests/toolchain/tools:tool_with_capability (tests/toolchain/tools/cat_tool.sh)
+Progress message: ''
+
+Inputs:
+tests/toolchain/tools/cat_tool.sh
+
+Outputs:
+bazel-out/<config>/bin/tests/features/_disable_all_features_subject.output
+
+Features:
+@@//tests/toolchain/tools:capability
+
+Execution requirements:
+
+
+Env:
+
+
+Command-line:

@@ -1,0 +1,68 @@
+# This is used by examples/rules_lang.
+package(default_visibility = ["//visibility:public"])
+
+constraint_setting(
+    name = "current_platform",
+    default_constraint_value = ":host",
+)
+
+constraint_value(
+    name = "host",
+    constraint_setting = ":current_platform",
+)
+
+# For now, we're just exec'ing on the host platform.
+alias(
+    name = "is_exec",
+    actual = ":host",
+)
+
+constraint_value(
+    name = "exec1",
+    constraint_setting = ":current_platform",
+)
+
+constraint_value(
+    name = "exec2",
+    constraint_setting = ":current_platform",
+)
+
+constraint_value(
+    name = "target1",
+    constraint_setting = ":current_platform",
+)
+
+constraint_value(
+    name = "target2",
+    constraint_setting = ":current_platform",
+)
+
+platform(
+    name = "host_platform",
+    constraint_values = [":host"],
+    parents = ["@platforms//host"],
+)
+
+platform(
+    name = "exec_platform1",
+    constraint_values = [":exec1"],
+    parents = ["@platforms//host"],
+)
+
+platform(
+    name = "exec_platform2",
+    constraint_values = [":exec2"],
+    parents = ["@platforms//host"],
+)
+
+platform(
+    name = "target_platform1",
+    constraint_values = [":target1"],
+    parents = ["@platforms//host"],
+)
+
+platform(
+    name = "target_platform2",
+    constraint_values = [":target2"],
+    parents = ["@platforms//host"],
+)

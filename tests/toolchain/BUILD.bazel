@@ -1,0 +1,34 @@
+load("@rules_toolchains//toolchains:feature.bzl", "feature")
+load("@rules_toolchains//toolchains:toolchain.bzl", "DEFAULT_EXEC_CONSTRAINT_GROUPS", "toolchain")
+
+package(default_visibility = ["//visibility:public"])
+
+toolchain_type(
+    name = "toolchain_type",
+)
+
+feature(
+    name = "default_feature",
+)
+
+feature(
+    name = "default_feature_implies",
+    implies = [":default_feature_implied"],
+)
+
+feature(
+    name = "default_feature_implied",
+)
+
+toolchain(
+    name = "toolchain",
+    default_features = [
+        ":default_feature_implies",
+        ":default_feature",
+    ],
+    exec_constraint_groups = DEFAULT_EXEC_CONSTRAINT_GROUPS,
+    # If you have tools such as ctests which have seperate binaries per exec-target pair (eg. gcc-<exec>-<target>),
+    # you can perform a select here over the target platform, then perform a select over the exec platform in the tool map.
+    tool_map = "//tests/toolchain/tools:tool_map",
+    toolchain_type = ":toolchain_type",
+)

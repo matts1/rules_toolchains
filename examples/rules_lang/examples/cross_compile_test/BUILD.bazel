@@ -1,0 +1,24 @@
+load("@rules_testing//lib:analysis_test.bzl", "analysis_test")
+load("//lang:defs.bzl", "lang_library")
+load(":matchers.bzl", "error_matching")
+load(":transitions.bzl", "target2_lang_library")
+
+lang_library(
+    name = "example",
+    srcs = ["example.lang"],
+)
+
+target2_lang_library(
+    name = "target2_library",
+    actual = ":example",
+    tags = ["manual"],
+)
+
+analysis_test(
+    name = "transition_follows_tool_map_test",
+    expect_failure = True,
+    # This particular failure mode is the expected one because of the following select in the tool map.
+    # "@rules_toolchains//tests/platforms:target2": "//lang/toolchain/default_toolchain/tools:empty_tool_map",
+    impl = error_matching("""Label("//lang/toolchain/actions:compile") not found in dictionary"""),
+    target = ":target2_library",
+)
