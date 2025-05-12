@@ -43,28 +43,29 @@ def collect_action_labels(actions):
 
 collect_files = _make_collector(DefaultInfo, "files")
 
-def collect_data(targets):
+def collect_data(ctx, targets):
     """Collects from a 'data' attribute.
 
     This is distinguished from collect_files by the fact that data attributes
     attributes include runfiles.
 
     Args:
+        ctx: Bazel's ctx object
         targets: (List[Target]) A list of files or executables
 
     Returns:
-        A list of FilesToRunProvider and depset[file] containing the files required
-        required to run them.
+        A runfiles object
     """
-    out = []
+    runfiles = []
+    transitive_files = []
     for target in targets:
         info = target[DefaultInfo]
         if info.default_runfiles != None:
-            out.append(info.default_runfiles.files)
+            runfiles.append(info.data_runfiles)
         if info.files != None:
-            out.append(info.files)
+            transitive_files.append(info.files)
 
-    return out
+    return ctx.runfiles(transitive_files = depset(transitive = transitive_files)).merge_all(runfiles)
 
 def collect_features(targets):
     return depset(transitive = [target[FeatureSetInfo].features for target in targets])

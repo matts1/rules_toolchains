@@ -243,7 +243,7 @@ A capability associated with a tool (eg. supports_pic).
 <pre>
 load("@rules_toolchains//toolchains:toolchain_info.bzl", "ToolInfo")
 
-ToolInfo(<a href="#ToolInfo-label">label</a>, <a href="#ToolInfo-exe">exe</a>, <a href="#ToolInfo-files_to_run">files_to_run</a>, <a href="#ToolInfo-execution_requirements">execution_requirements</a>, <a href="#ToolInfo-capabilities">capabilities</a>)
+ToolInfo(<a href="#ToolInfo-label">label</a>, <a href="#ToolInfo-exe">exe</a>, <a href="#ToolInfo-runfiles">runfiles</a>, <a href="#ToolInfo-execution_requirements">execution_requirements</a>, <a href="#ToolInfo-capabilities">capabilities</a>)
 </pre>
 
 A binary, with additional metadata to make it useful for action configs.
@@ -254,7 +254,7 @@ A binary, with additional metadata to make it useful for action configs.
 | :------------- | :------------- |
 | <a id="ToolInfo-label"></a>label |  (Label) The label defining this provider. Place in error messages to simplify debugging    |
 | <a id="ToolInfo-exe"></a>exe |  (File) The file corresponding to the tool    |
-| <a id="ToolInfo-files_to_run"></a>files_to_run |  (list[Union[FilesToRunProvider, depset[File]]) The files needed to run the executable    |
+| <a id="ToolInfo-runfiles"></a>runfiles |  (runfiles) The files needed to run the executable    |
 | <a id="ToolInfo-execution_requirements"></a>execution_requirements |  (Sequence[str]) A set of execution requirements of the tool    |
 | <a id="ToolInfo-capabilities"></a>capabilities |  (Sequence[ToolCapabilityInfo]) Capabilities supported by the tool.    |
 

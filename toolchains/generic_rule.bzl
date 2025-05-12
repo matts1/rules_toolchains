@@ -99,7 +99,7 @@ def run_action(
         progress_message = progress_message,
         arguments = args,
         env = execution_ctx.env,
-        tools = tool.files_to_run,
+        tools = tool.runfiles.files,
         inputs = inputs,
         execution_requirements = execution_ctx.execution_requirements,
         resource_set = resource_set,
@@ -135,7 +135,7 @@ def run_action(
                 "TOOL_EXE": tool.exe.path,
                 "EXECUTION_REQUIREMENTS": json.encode(execution_ctx.execution_requirements),
             },
-            tools = tool.files_to_run,
+            tools = tool.runfiles.files,
             inputs = inputs,
             execution_requirements = execution_ctx.execution_requirements,
         )

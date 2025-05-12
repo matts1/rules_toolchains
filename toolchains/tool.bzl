@@ -29,14 +29,12 @@ def _tool_impl(ctx):
     else:
         fail("Expected tool's src attribute to be either an executable or a single file")
 
-    data = collect_data(ctx.attr.data + [ctx.attr.src])
-    if exe_info.files_to_run != None:
-        data.append(exe_info.files_to_run)
+    data = collect_data(ctx, ctx.attr.data + [ctx.attr.src])
 
     tool = ToolInfo(
         label = ctx.label,
         exe = exe,
-        files_to_run = data,
+        runfiles = data,
         execution_requirements = ctx.attr.execution_requirements,
         capabilities = tuple([target[ToolCapabilityInfo] for target in ctx.attr.capabilities]),
     )
@@ -53,7 +51,7 @@ def _tool_impl(ctx):
         # be very helpful when debugging toolchains.
         DefaultInfo(
             files = depset([link]),
-            runfiles = ctx.runfiles(transitive_files = depset(transitive = [element for element in data if type(element) == "depset"])),
+            runfiles = data,
             executable = link,
         ),
     ]
