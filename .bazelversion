@@ -1,4 +1,4 @@
-7.7.1
+9.0.0
 # CI breaks when updating this file to bazel 8.
 # See https://github.com/bazel-contrib/rules-template/issues/138
 
