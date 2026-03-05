@@ -13,7 +13,7 @@
 # limitations under the License.
 """Implementation of tool"""
 
-load("//toolchains/private:collect.bzl", "collect_data")
+load("//toolchains/private:collect.bzl", "collect_data", "collect_provider")
 load(
     ":toolchain_info.bzl",
     "ToolCapabilityInfo",
@@ -29,14 +29,13 @@ def _tool_impl(ctx):
     else:
         fail("Expected tool's src attribute to be either an executable or a single file")
 
-    data = collect_data(ctx, ctx.attr.data + [ctx.attr.src])
-
+    data = collect_data(ctx.attr.data + [ctx.attr.src])
     tool = ToolInfo(
         label = ctx.label,
         exe = exe,
-        runfiles = data,
+        files_to_run = data,
         execution_requirements = ctx.attr.execution_requirements,
-        capabilities = tuple([target[ToolCapabilityInfo] for target in ctx.attr.capabilities]),
+        capabilities = tuple(collect_provider(ctx.attr.capabilities, ToolCapabilityInfo)),
     )
 
     link = ctx.actions.declare_file(ctx.label.name)
@@ -51,7 +50,7 @@ def _tool_impl(ctx):
         # be very helpful when debugging toolchains.
         DefaultInfo(
             files = depset([link]),
-            runfiles = data,
+            runfiles = ctx.runfiles(transitive_files = depset(transitive = [element for element in data if type(element) == "depset"])),
             executable = link,
         ),
     ]

@@ -17,7 +17,9 @@ load(
     "//toolchains/private:collect.bzl",
     "collect_args_lists",
     "collect_features",
+    "collect_provider",
 )
+load("//toolchains/private:small_set.bzl", "create_small_set")
 load(
     ":toolchain_info.bzl",
     "ArgsListInfo",
@@ -27,22 +29,28 @@ load(
     "MutuallyExclusiveCategoryInfo",
 )
 
-def _validate(self, features):
-    if self.label not in features:
-        return "%s is disabled" % self.label
-    return None
-
 def _feature_impl(ctx):
     args = collect_args_lists(ctx.attr.args)
     feature = FeatureInfo(
         label = ctx.label,
         args = args,
-        implies = tuple(collect_features(ctx.attr.implies).to_list()),
-        requires = tuple([target[FeatureConstraintInfo] for target in ctx.attr.requires]),
-        mutually_exclusive = tuple([target[MutuallyExclusiveCategoryInfo] for target in ctx.attr.mutually_exclusive]),
+        implies = collect_features(collect_provider(ctx.attr.implies, FeatureSetInfo)),
+        requires = tuple(collect_provider(
+            ctx.attr.requires,
+            FeatureConstraintInfo,
+        )),
+        mutually_exclusive = tuple(collect_provider(
+            ctx.attr.mutually_exclusive,
+            MutuallyExclusiveCategoryInfo,
+        )),
     )
 
-    feature_set = depset([feature])
+    feature_set = create_small_set([feature])
+
+    def validate(self, features):
+        if self.label not in features:
+            return "%s is disabled" % self.label
+        return None
 
     return [
         feature,
@@ -50,7 +58,7 @@ def _feature_impl(ctx):
         FeatureConstraintInfo(
             label = ctx.label,
             storage = None,
-            validate = _validate,
+            validate = validate,
         ),
         MutuallyExclusiveCategoryInfo(label = ctx.label),
     ]

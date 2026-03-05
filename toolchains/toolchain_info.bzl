@@ -101,7 +101,7 @@ FeatureSetInfo = provider(
     # @unsorted-dict-items
     fields = {
         "label": "(Label) The label defining this provider. Place in error messages to simplify debugging",
-        "features": "(depset[FeatureInfo]) The set of features this corresponds to",
+        "features": "(SmallSet[FeatureInfo]) The set of features this corresponds to",
     },
 )
 
@@ -129,7 +129,7 @@ ToolInfo = provider(
     fields = {
         "label": "(Label) The label defining this provider. Place in error messages to simplify debugging",
         "exe": "(File) The file corresponding to the tool",
-        "runfiles": "(runfiles) The files needed to run the executable",
+        "files_to_run": "(list[Union[FilesToRunProvider, depset[File]]) The files needed to run the executable",
         "execution_requirements": "(Sequence[str]) A set of execution requirements of the tool",
         "capabilities": "(Sequence[ToolCapabilityInfo]) Capabilities supported by the tool.",
     },

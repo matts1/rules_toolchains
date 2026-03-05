@@ -14,13 +14,13 @@ default_language_version:
 repos:
   # Check formatting and lint for starlark code
   - repo: https://github.com/keith/pre-commit-buildifier
-    rev: 8.2.1
+    rev: 8.0.1
     hooks:
       - id: buildifier
       - id: buildifier-lint
   # Enforce that commit messages allow for later changelog generation
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.13.9
+    rev: v4.1.1
     hooks:
       # Requires that commitizen is already installed
       - id: commitizen

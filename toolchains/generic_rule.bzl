@@ -2,7 +2,7 @@
 
 load("//toolchains:toolchain_info.bzl", "ArgsListInfo", "FeatureInfo", "FeatureSetInfo")
 load("//toolchains/private:action.bzl", "resolve_action_from_toolchain")
-load("//toolchains/private:collect.bzl", "collect_args_lists")
+load("//toolchains/private:collect.bzl", "collect_args_lists", "collect_provider")
 
 visibility("public")
 
@@ -20,9 +20,6 @@ def run_action(
         extra_args = None,
         extra_inputs = [],
         extra_outputs = [],
-        exec_group = None,
-        resource_set = None,
-        toolchain_type = None,
         inputs_file = None):
     """Calls ctx.actions.run with the appropriate CLI based on toolchain config.
 
@@ -46,19 +43,15 @@ def run_action(
           been explicitly added for this action only.
         extra_inputs: (Sequence[File]) Additional inputs to this action.
         extra_outputs: (Sequence[File]) Additional outputs to this action.
-        exec_group: (Optional[string]) Passed through to ctx.actions.run
-        resource_set: (Optional[Callback]) Passed through to ctx.actions.run
-        toolchain_type: (Optional[Label]) Passed through to
-          ctx.actions.run(toolchain = toolchain_type)
         inputs_file: (Optional[File]) If provided, this file will be filled
           with all inputs to this action.
     """
     if ctx.attr.features:
         fail("Features is a reserved attribute in bazel. Use the attributes `enabled_features` and `disabled_features` instead")
     if enabled_features == None:
-        enabled_features = [target[FeatureInfo] for target in ctx.attr.enabled_features]
+        enabled_features = collect_provider(ctx.attr.enabled_features, FeatureInfo)
     if disabled_features == None:
-        disabled_features = [target[FeatureInfo] for target in ctx.attr.disabled_features]
+        disabled_features = collect_provider(ctx.attr.disabled_features, FeatureInfo)
     if extra_args == None:
         extra_args = collect_args_lists(ctx.attr.extra_args)
 
@@ -99,12 +92,9 @@ def run_action(
         progress_message = progress_message,
         arguments = args,
         env = execution_ctx.env,
-        tools = tool.runfiles.files,
+        tools = tool.files_to_run,
         inputs = inputs,
         execution_requirements = execution_ctx.execution_requirements,
-        resource_set = resource_set,
-        exec_group = exec_group,
-        toolchain = toolchain_type,
     )
 
     if inputs_file:
@@ -135,7 +125,7 @@ def run_action(
                 "TOOL_EXE": tool.exe.path,
                 "EXECUTION_REQUIREMENTS": json.encode(execution_ctx.execution_requirements),
             },
-            tools = tool.runfiles.files,
+            tools = tool.files_to_run,
             inputs = inputs,
             execution_requirements = execution_ctx.execution_requirements,
         )

@@ -22,6 +22,7 @@ bzl_library(
     name = "collect",
     srcs = ["collect.bzl"],
     deps = [
+        ":small_set",
         "//toolchains:toolchain_info",
     ],
 )
@@ -30,4 +31,9 @@ bzl_library(
     name = "features",
     srcs = ["features.bzl"],
     deps = ["//toolchains:toolchain_info"],
+)
+
+bzl_library(
+    name = "small_set",
+    srcs = ["small_set.bzl"],
 )

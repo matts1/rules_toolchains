@@ -42,7 +42,7 @@ def _lang_library_impl(ctx):
 lang_library = rule(
     implementation = _lang_library_impl,
     attrs = {
-        "srcs": attr.label_list(allow_files = True),
+        "sources": attr.label_list(allow_files = True),
         "deps": attr.label_list(providers = [LangInfo]),
         "_compile_action": attr.label(default = "//lang/toolchain/actions:compile"),
     } | GENERIC_RULE_ATTRS,
@@ -80,7 +80,7 @@ def _lang_binary_impl(ctx):
 _BINARY_KWARGS = dict(
     implementation = _lang_binary_impl,
     attrs = {
-        "srcs": attr.label_list(allow_files = True),
+        "sources": attr.label_list(allow_files = True),
         "deps": attr.label_list(providers = [LangInfo]),
         "_compile_action": attr.label(default = "//lang/toolchain/actions:compile"),
         "_link_action": attr.label(default = "//lang/toolchain/actions:link"),

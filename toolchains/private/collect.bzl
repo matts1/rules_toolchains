@@ -17,21 +17,42 @@ load(
     "//toolchains:toolchain_info.bzl",
     "ActionTypeSetInfo",
     "ArgsListInfo",
-    "FeatureSetInfo",
     "ToolInfo",
 )
+load(":small_set.bzl", "merge_small_sets")
 
 visibility([
     "//toolchains/...",
     "//tests/...",
 ])
 
+def collect_provider(targets, provider):
+    """Collects providers from a label list.
+
+    Args:
+        targets: (List[Target]) An attribute from attr.label_list
+        provider: (provider) The provider to look up
+    Returns:
+        A list of the providers
+    """
+    return [target[provider] for target in targets]
+
+def collect_defaultinfo(targets):
+    """Collects DefaultInfo from a label list.
+
+    Args:
+        targets: (List[Target]) An attribute from attr.label_list
+    Returns:
+        A list of the associated defaultinfo
+    """
+    return collect_provider(targets, DefaultInfo)
+
 def _make_collector(provider, field):
     def collector(targets, direct = [], transitive = []):
         # Avoid mutating what was passed in.
         transitive = transitive[:]
-        for target in targets:
-            transitive.append(getattr(target[provider], field))
+        for value in collect_provider(targets, provider):
+            transitive.append(getattr(value, field))
         return depset(direct = direct, transitive = transitive)
 
     return collector
@@ -43,32 +64,29 @@ def collect_action_labels(actions):
 
 collect_files = _make_collector(DefaultInfo, "files")
 
-def collect_data(ctx, targets):
+def collect_data(targets):
     """Collects from a 'data' attribute.
 
     This is distinguished from collect_files by the fact that data attributes
     attributes include runfiles.
 
     Args:
-        ctx: Bazel's ctx object
         targets: (List[Target]) A list of files or executables
 
     Returns:
-        A runfiles object
+        A list of FilesToRunProvider and depset[file] containing the files required
+        required to run them.
     """
-    runfiles = []
-    transitive_files = []
-    for target in targets:
-        info = target[DefaultInfo]
-        if info.default_runfiles != None:
-            runfiles.append(info.data_runfiles)
-        if info.files != None:
-            transitive_files.append(info.files)
+    out = []
+    for info in collect_defaultinfo(targets):
+        if info.files_to_run != None:
+            out.append(info.files_to_run)
+        out.append(info.files)
 
-    return ctx.runfiles(transitive_files = depset(transitive = transitive_files)).merge_all(runfiles)
+    return out
 
-def collect_features(targets):
-    return depset(transitive = [target[FeatureSetInfo].features for target in targets])
+def collect_features(feature_sets):
+    return merge_small_sets([feature_set.features for feature_set in feature_sets])
 
 def collect_tools(ctx, targets, fail = fail):
     """Collects tools from a label_list.

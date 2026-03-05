@@ -4,13 +4,11 @@ bazel_dep(
     name = "rules_toolchains",
     version = "0.0.0",
 )
-bazel_dep(name = "platforms", version = "0.0.11")
-
-bazel_dep(name = "rules_testing", version = "0.9.0", dev_dependency = True)
+bazel_dep(name = "platforms", version = "0.0.10")
 
 local_path_override(
     module_name = "rules_toolchains",
     path = "../..",
 )
 
-register_toolchains("//lang/toolchain/default_toolchain:all")
+register_toolchains("//lang/toolchain/default_toolchain")
